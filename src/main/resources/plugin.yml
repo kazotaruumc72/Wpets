@@ -1,7 +1,7 @@
 name: Wpets
 version: '${project.version}'
 main: fr.wpets.WpetsPlugin
-api-version: '1.20'
+api-version: '1.21'
 description: Custom pet plugin with skill trees, level milestones, and MythicMobs/ModelEngine integration.
 authors:
   - WpetsDev
