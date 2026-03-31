@@ -1,0 +1,49 @@
+# ==========================================
+#          Wpets - Messages
+# ==========================================
+prefix: "&8[&6Wpets&8] &r"
+
+no-permission: "&cYou don't have permission to do this."
+plugin-reloaded: "&aWpets has been reloaded successfully."
+
+# Pet commands
+pet-summoned: "&aYour pet &6{pet} &ahas been summoned!"
+pet-dismissed: "&aYour pet has been dismissed."
+pet-already-active: "&cYou already have a pet active. Dismiss it first with /pet dismiss."
+pet-not-active: "&cYou don't have an active pet."
+pet-not-found: "&cPet type &6{pet} &cwas not found."
+pet-no-pet: "&cYou don't have a pet of type &6{pet}&c."
+
+# Level & XP
+level-up: "&6&l✦ Level Up! &r&eYour pet &6{pet} &ehas reached &6Level {level}&e!"
+xp-gained: "&7+&a{xp} &7XP for your pet."
+max-level: "&6Your pet has reached the &lmaximum level&6!"
+
+# Milestones
+milestone-10: "&6&l★ Milestone! &r&eYour pet has reached &6Level 10&e and unlocked &aparticle effects&e!"
+milestone-30: "&6&l★ Milestone! &r&eYour pet has reached &6Level 30 &eand evolved!"
+milestone-50: "&6&l★ Milestone! &r&eYour pet has reached &6Level 50 &eand unlocked its &c&lultimate skill&e!"
+milestone-100: "&6&l★ LEGENDARY! &r&eYour pet has reached &6Level 100 &eand transformed into its final form!"
+
+# Skill tree
+skill-unlocked: "&aSkill &6{skill} &aunlocked!"
+skill-already-unlocked: "&cYou have already unlocked &6{skill}&c."
+skill-not-enough-points: "&cYou don't have enough skill points. You need &6{cost}&c point(s)."
+skill-requirements-not-met: "&cYou haven't unlocked the required skills yet."
+skill-points-remaining: "&7Skill points: &6{points}"
+
+# Info
+pet-info-header: "&8&m----&r &6Pet: {name} &8&m----"
+pet-info-level: "&7Level: &6{level}&7/{max}"
+pet-info-xp: "&7XP: &6{xp}&7/{required}"
+pet-info-skill-points: "&7Skill Points: &6{points}"
+pet-info-health: "&7Health: &6{health}"
+pet-info-damage: "&7Damage: &6{damage}"
+pet-info-speed: "&7Speed: &6{speed}"
+pet-info-armor: "&7Armor: &6{armor}"
+
+# Admin
+admin-set-level: "&aSet {player}'s pet &6{pet} &ato level &6{level}&a."
+admin-give-xp: "&aGave &6{xp} &aXP to {player}'s pet &6{pet}&a."
+admin-player-not-found: "&cPlayer &6{player} &cnot found or not online."
+invalid-args: "&cInvalid arguments. Usage: {usage}"

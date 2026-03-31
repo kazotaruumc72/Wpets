@@ -1,0 +1,35 @@
+name: Wpets
+version: '${project.version}'
+main: fr.wpets.WpetsPlugin
+api-version: '1.20'
+description: Custom pet plugin with skill trees, level milestones, and MythicMobs/ModelEngine integration.
+authors:
+  - WpetsDev
+
+softdepend:
+  - MythicMobs
+  - ModelEngine
+
+commands:
+  pet:
+    description: Main command for the Wpets plugin.
+    usage: /pet <summon|dismiss|info|skills|help> [args...]
+    aliases: [pets, familier]
+  wpets:
+    description: Admin command for the Wpets plugin.
+    usage: /wpets <reload|setlevel|givexp> [player] [args...]
+    permission: wpets.admin
+
+permissions:
+  wpets.use:
+    description: Allows a player to use the pet system.
+    default: true
+  wpets.admin:
+    description: Allows full administrative control over the Wpets plugin.
+    default: op
+  wpets.pet.summon:
+    description: Allows a player to summon their pet.
+    default: true
+  wpets.pet.skills:
+    description: Allows a player to open the skill tree GUI.
+    default: true

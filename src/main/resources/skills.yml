@@ -1,0 +1,181 @@
+# ==========================================
+#          Wpets - Skill Tree Definitions
+# ==========================================
+# Branches: TANK, DAMAGE, UTILITY
+# 'mythic-skill' is the MythicMobs skill name executed when the skill activates.
+# 'required-nodes' are node IDs that must be unlocked first.
+# 'cost' is the skill-point cost.
+
+skill-tree:
+
+  # ---- TANK BRANCH ----
+  tank_fortify:
+    display-name: "&aFortify"
+    branch: TANK
+    description: "Increases the pet's max health by 10%."
+    cost: 1
+    required-nodes: []
+    mythic-skill: WpetsSkillFortify
+    passive: true
+    stat-bonus:
+      max-health-percent: 10
+
+  tank_iron_hide:
+    display-name: "&aIron Hide"
+    branch: TANK
+    description: "Grants +20% armor to the pet."
+    cost: 2
+    required-nodes:
+      - tank_fortify
+    mythic-skill: WpetsSkillIronHide
+    passive: true
+    stat-bonus:
+      armor-percent: 20
+
+  tank_guardian_shield:
+    display-name: "&aGuardian Shield"
+    branch: TANK
+    description: "The pet absorbs 15% of damage dealt to you."
+    cost: 3
+    required-nodes:
+      - tank_iron_hide
+    mythic-skill: WpetsSkillGuardianShield
+    passive: false
+
+  tank_regeneration:
+    display-name: "&aRegeneration Aura"
+    branch: TANK
+    description: "The pet passively regenerates 2% HP per second."
+    cost: 2
+    required-nodes:
+      - tank_fortify
+    mythic-skill: WpetsSkillRegenAura
+    passive: true
+
+  # ---- DAMAGE BRANCH ----
+  dmg_sharpened_claws:
+    display-name: "&cSharpened Claws"
+    branch: DAMAGE
+    description: "Increases the pet's damage by 15%."
+    cost: 1
+    required-nodes: []
+    mythic-skill: WpetsSkillSharpenedClaws
+    passive: true
+    stat-bonus:
+      damage-percent: 15
+
+  dmg_feral_strike:
+    display-name: "&cFeral Strike"
+    branch: DAMAGE
+    description: "Every 5th attack hits for double damage."
+    cost: 2
+    required-nodes:
+      - dmg_sharpened_claws
+    mythic-skill: WpetsSkillFeralStrike
+    passive: false
+
+  dmg_venomous_bite:
+    display-name: "&cVenomous Bite"
+    branch: DAMAGE
+    description: "Attacks apply Poison II for 3 seconds."
+    cost: 2
+    required-nodes:
+      - dmg_sharpened_claws
+    mythic-skill: WpetsSkillVenomousBite
+    passive: false
+
+  dmg_area_howl:
+    display-name: "&cWar Howl"
+    branch: DAMAGE
+    description: "AoE attack dealing 150% damage in a 5-block radius. Cooldown: 20s."
+    cost: 3
+    required-nodes:
+      - dmg_feral_strike
+    mythic-skill: WpetsSkillWarHowl
+    passive: false
+
+  dmg_ultimate:
+    display-name: "&4&lUltimate: Apex Predator"
+    branch: DAMAGE
+    description: "Unlocks the pet's ultimate attack. Unlocked at level 50."
+    cost: 5
+    required-nodes:
+      - dmg_area_howl
+      - dmg_venomous_bite
+    mythic-skill: WpetsSkillApexPredator
+    passive: false
+    level-required: 50
+
+  # ---- UTILITY BRANCH ----
+  util_swift_paws:
+    display-name: "&bSwift Paws"
+    branch: UTILITY
+    description: "Increases the pet's movement speed by 10%."
+    cost: 1
+    required-nodes: []
+    mythic-skill: WpetsSkillSwiftPaws
+    passive: true
+    stat-bonus:
+      speed-percent: 10
+
+  util_pack_bond:
+    display-name: "&bPack Bond"
+    branch: UTILITY
+    description: "Grants the player Haste I while the pet is active."
+    cost: 2
+    required-nodes:
+      - util_swift_paws
+    mythic-skill: WpetsSkillPackBond
+    passive: true
+
+  util_inventory_small:
+    display-name: "&bPet Pouch (Small)"
+    branch: UTILITY
+    description: "Unlocks a 9-slot personal inventory for the pet."
+    cost: 2
+    required-nodes: []
+    mythic-skill: ""
+    passive: true
+    inventory-slots: 9
+
+  util_inventory_medium:
+    display-name: "&bPet Pouch (Medium)"
+    branch: UTILITY
+    description: "Expands the pet's personal inventory to 18 slots."
+    cost: 3
+    required-nodes:
+      - util_inventory_small
+    mythic-skill: ""
+    passive: true
+    inventory-slots: 18
+
+  util_inventory_large:
+    display-name: "&bPet Pouch (Large)"
+    branch: UTILITY
+    description: "Expands the pet's personal inventory to 27 slots."
+    cost: 4
+    required-nodes:
+      - util_inventory_medium
+    mythic-skill: ""
+    passive: true
+    inventory-slots: 27
+
+  util_healing_aura:
+    display-name: "&bHealing Aura"
+    branch: UTILITY
+    description: "The pet heals the player for 2 HP every 10 seconds."
+    cost: 3
+    required-nodes:
+      - util_pack_bond
+    mythic-skill: WpetsSkillHealingAura
+    passive: false
+
+  util_debuff_snarl:
+    display-name: "&bDebilitating Snarl"
+    branch: UTILITY
+    description: "Applies Weakness I and Slowness I to nearby enemies. Cooldown: 30s."
+    cost: 3
+    required-nodes:
+      - util_pack_bond
+    mythic-skill: WpetsSkillDebilitatingSnarl
+    passive: false

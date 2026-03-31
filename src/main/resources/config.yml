@@ -1,0 +1,65 @@
+# ==========================================
+#           Wpets - Configuration
+# ==========================================
+
+# Database settings
+database:
+  # Type: sqlite or mysql
+  type: sqlite
+  # SQLite file path (relative to plugin data folder)
+  sqlite-file: wpets.db
+  # MySQL connection settings (only used when type: mysql)
+  mysql:
+    host: localhost
+    port: 3306
+    database: wpets
+    username: root
+    password: ''
+    # Connection pool settings
+    max-pool-size: 10
+    connection-timeout: 30000
+    idle-timeout: 600000
+    max-lifetime: 1800000
+
+# XP formula: XP_required = level^2 * multiplier
+xp-formula-multiplier: 100
+
+# Auto-save interval in seconds
+auto-save-interval: 300
+
+# Maximum pet level
+max-level: 100
+
+# Skill points awarded per level
+skill-points-per-level: 1
+
+# Pet follow distance (blocks)
+pet-follow-distance: 4.0
+
+# Whether ModelEngine integration is enabled (requires ModelEngine plugin)
+modelengine-enabled: false
+
+# Whether to show level-up particles
+show-levelup-particles: true
+
+# Level milestone rewards
+milestones:
+  10:
+    pet-particles: true
+    player-commands:
+      - "eco give {player} 500"
+      - "lp user {player} meta addprefix 100 [PetTamer]"
+  30:
+    pet-model-change: true
+    player-speed-boost: 0.05
+    player-commands: []
+  50:
+    pet-ultimate-skill: true
+    player-commands:
+      - "give {player} netherite_sword 1"
+  100:
+    pet-corrupted-model: true
+    pet-aura: true
+    player-commands:
+      - "advancement grant {player} only wpets:legendary_tamer"
+      - "loot give {player} loot wpets:legendary_crate"

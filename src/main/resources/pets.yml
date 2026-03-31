@@ -1,0 +1,62 @@
+# ==========================================
+#           Wpets - Pet Definitions
+# ==========================================
+# Each entry defines one pet type.
+# 'mythicmob-id' is the internal name used in MythicMobs mobs.yml
+# 'model-id' is the model name registered in ModelEngine
+
+pets:
+  wolf_guardian:
+    display-name: "&6Wolf Guardian"
+    mythicmob-id: WpetsWolfGuardian
+    # ModelEngine model id (leave empty to use default mob model)
+    model-id: wolf_guardian
+    model-id-level30: wolf_guardian_elder
+    model-id-level100: wolf_guardian_corrupted
+    # Base statistics (at level 1)
+    base-stats:
+      max-health: 20.0
+      damage: 4.0
+      speed: 0.3
+      armor: 2.0
+    # Stat increase per level
+    stats-per-level:
+      max-health: 2.0
+      damage: 0.5
+      speed: 0.002
+      armor: 0.1
+    # Stat multiplier (global scaling)
+    stats-multiplier: 1.0
+    # XP sources and amounts
+    xp-sources:
+      mob-kill: 10
+      mining: 2
+      feeding: 5
+    # Item used to feed this pet
+    feed-item: BONE
+    # Particle effect at level 10+
+    level10-particle: FLAME
+
+  cat_familiar:
+    display-name: "&bCat Familiar"
+    mythicmob-id: WpetsCatFamiliar
+    model-id: cat_familiar
+    model-id-level30: cat_familiar_elder
+    model-id-level100: cat_familiar_divine
+    base-stats:
+      max-health: 15.0
+      damage: 3.0
+      speed: 0.35
+      armor: 1.0
+    stats-per-level:
+      max-health: 1.5
+      damage: 0.4
+      speed: 0.003
+      armor: 0.08
+    stats-multiplier: 1.0
+    xp-sources:
+      mob-kill: 8
+      mining: 3
+      feeding: 6
+    feed-item: COD
+    level10-particle: HEART
