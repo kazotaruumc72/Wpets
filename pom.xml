@@ -55,7 +55,7 @@
         <!-- ModelEngine API (from Lumine repository) -->
         <dependency>
             <groupId>com.ticxo.modelengine</groupId>
-            <artifactId>api</artifactId>
+            <artifactId>ModelEngine</artifactId>
             <version>R4.0.9</version>
             <scope>provided</scope>
         </dependency>
