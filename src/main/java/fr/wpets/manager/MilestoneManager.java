@@ -5,6 +5,7 @@ import fr.wpets.model.PetData;
 import fr.wpets.util.MessageUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.NamespacedKey;
 import org.bukkit.Particle;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.configuration.ConfigurationSection;
@@ -241,10 +242,10 @@ public class MilestoneManager {
         var attr = player.getAttribute(Attribute.MOVEMENT_SPEED);
         if (attr == null) return;
 
+        NamespacedKey modifierKey = new NamespacedKey(plugin, "wpets_speed_boost");
         org.bukkit.attribute.AttributeModifier modifier =
                 new org.bukkit.attribute.AttributeModifier(
-                        UUID.randomUUID(),
-                        "wpets_speed_boost",
+                        modifierKey,
                         amount,
                         org.bukkit.attribute.AttributeModifier.Operation.ADD_NUMBER
                 );
