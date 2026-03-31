@@ -203,14 +203,14 @@ public class PetManager {
         speed = applySkillBonuses(speed, "speed", petData);
 
         // Set health attribute
-        var healthAttr = living.getAttribute(Attribute.GENERIC_MAX_HEALTH);
+        var healthAttr = living.getAttribute(Attribute.MAX_HEALTH);
         if (healthAttr != null) {
             healthAttr.setBaseValue(Math.max(1, maxHealth));
             living.setHealth(Math.min(living.getHealth(), healthAttr.getValue()));
         }
 
         // Set movement speed attribute
-        var speedAttr = living.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED);
+        var speedAttr = living.getAttribute(Attribute.MOVEMENT_SPEED);
         if (speedAttr != null) {
             speedAttr.setBaseValue(Math.max(0.05, speed));
         }
@@ -219,7 +219,7 @@ public class PetManager {
         double baseArmor = base != null ? base.getDouble("armor", 2) : 2;
         double armorPerLvl = perLevel != null ? perLevel.getDouble("armor", 0.1) : 0.1;
         double armor = applySkillBonuses((baseArmor + (level - 1) * armorPerLvl) * multiplier, "armor", petData);
-        var armorAttr = living.getAttribute(Attribute.GENERIC_ARMOR);
+        var armorAttr = living.getAttribute(Attribute.ARMOR);
         if (armorAttr != null) {
             armorAttr.setBaseValue(Math.max(0, armor));
         }
@@ -279,10 +279,13 @@ public class PetManager {
         try {
             var modeledEntity = com.ticxo.modelengine.api.ModelEngineAPI.getOrCreateModeledEntity(entity);
             // Remove all existing models first
-            modeledEntity.removeAllModels();
+            for (var model : new java.util.ArrayList<>(modeledEntity.getModels().values())) {
+                modeledEntity.removeModel(model.getModelId());
+            }
             var blueprint = com.ticxo.modelengine.api.ModelEngineAPI.getBlueprint(modelId);
             if (blueprint != null) {
-                modeledEntity.addModel(blueprint, true);
+                var activeModel = com.ticxo.modelengine.api.ModelEngineAPI.createActiveModel(blueprint);
+                modeledEntity.addModel(activeModel, true);
             } else {
                 plugin.getLogger().warning("ModelEngine blueprint not found: " + modelId);
             }

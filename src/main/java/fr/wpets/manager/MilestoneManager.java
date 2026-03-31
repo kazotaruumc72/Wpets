@@ -157,7 +157,7 @@ public class MilestoneManager {
 
         // Remove speed boost
         if (speedBoostedPlayers.remove(player.getUniqueId())) {
-            var attr = player.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED);
+            var attr = player.getAttribute(Attribute.MOVEMENT_SPEED);
             if (attr != null) {
                 // Remove our modifier
                 attr.getModifiers().stream()
@@ -238,7 +238,7 @@ public class MilestoneManager {
     private void applyPlayerSpeedBoost(Player player, double amount) {
         if (speedBoostedPlayers.contains(player.getUniqueId())) return;
 
-        var attr = player.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED);
+        var attr = player.getAttribute(Attribute.MOVEMENT_SPEED);
         if (attr == null) return;
 
         org.bukkit.attribute.AttributeModifier modifier =
