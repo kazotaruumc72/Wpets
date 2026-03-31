@@ -40,7 +40,7 @@
         <dependency>
             <groupId>io.papermc.paper</groupId>
             <artifactId>paper-api</artifactId>
-            <version>1.20.4-R0.1-SNAPSHOT</version>
+            <version>1.21.4-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
 
@@ -52,18 +52,13 @@
             <scope>provided</scope>
         </dependency>
 
-        <!-- ModelEngine (provided as local server jar) -->
-        <!-- Add to local Maven repo with:
-             mvn install:install-file -Dfile=ModelEngine.jar -DgroupId=com.ticxo.modelengine
-                 -DartifactId=ModelEngine -Dversion=R3.0.0 -Dpackaging=jar -->
-        <!-- Uncomment when ModelEngine jar is available:
+        <!-- ModelEngine API (from Lumine repository) -->
         <dependency>
             <groupId>com.ticxo.modelengine</groupId>
-            <artifactId>ModelEngine</artifactId>
-            <version>R3.0.0</version>
+            <artifactId>api</artifactId>
+            <version>R4.0.9</version>
             <scope>provided</scope>
         </dependency>
-        -->
 
         <!-- SQLite JDBC (bundled) -->
         <dependency>
