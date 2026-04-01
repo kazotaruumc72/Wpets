@@ -111,10 +111,7 @@
                         <configuration>
                             <createDependencyReducedPom>false</createDependencyReducedPom>
                             <relocations>
-                                <relocation>
-                                    <pattern>org.sqlite</pattern>
-                                    <shadedPattern>fr.wpets.libs.sqlite</shadedPattern>
-                                </relocation>
+                                <!-- Do NOT relocate org.sqlite - native libraries won't load after relocation -->
                                 <relocation>
                                     <pattern>com.mysql</pattern>
                                     <shadedPattern>fr.wpets.libs.mysql</shadedPattern>

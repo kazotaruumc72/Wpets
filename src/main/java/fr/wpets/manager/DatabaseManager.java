@@ -81,7 +81,8 @@ public class DatabaseManager {
         java.io.File dbFile = new java.io.File(plugin.getDataFolder(), fileName);
 
         try {
-            Class.forName("fr.wpets.libs.sqlite.JDBC");
+            // Use original class name - org.sqlite cannot be relocated due to native library loading
+            Class.forName("org.sqlite.JDBC");
         } catch (ClassNotFoundException e) {
             throw new SQLException("SQLite driver not found", e);
         }
