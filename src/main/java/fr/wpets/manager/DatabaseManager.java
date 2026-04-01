@@ -67,7 +67,7 @@ public class DatabaseManager {
                 + "?useSSL=false&allowPublicKeyRetrieval=true&autoReconnect=true";
 
         try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
+            Class.forName("fr.wpets.libs.mysql.cj.jdbc.Driver");
         } catch (ClassNotFoundException e) {
             throw new SQLException("MySQL driver not found", e);
         }
@@ -81,7 +81,7 @@ public class DatabaseManager {
         java.io.File dbFile = new java.io.File(plugin.getDataFolder(), fileName);
 
         try {
-            Class.forName("org.sqlite.JDBC");
+            Class.forName("fr.wpets.libs.sqlite.JDBC");
         } catch (ClassNotFoundException e) {
             throw new SQLException("SQLite driver not found", e);
         }
