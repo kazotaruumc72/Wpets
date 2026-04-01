@@ -8,6 +8,18 @@
 pets:
   wolf_guardian:
     display-name: "&6Wolf Guardian"
+    # Permission required to summon this pet
+    permission: "wpets.pet.wolf_guardian"
+    # Menu icon configuration
+    menu-icon:
+      material: BONE
+      custom-model-data: 1001
+      display-name: "&6Wolf Guardian"
+      lore:
+        - "&7A fierce and loyal companion"
+        - "&7that grows stronger with you."
+        - ""
+        - "&eClick to summon!"
     mythicmob-id: WpetsWolfGuardian
     # ModelEngine model id (leave empty to use default mob model)
     model-id: wolf_guardian
@@ -39,6 +51,18 @@ pets:
 
   cat_familiar:
     display-name: "&bCat Familiar"
+    # Permission required to summon this pet
+    permission: "wpets.pet.cat_familiar"
+    # Menu icon configuration
+    menu-icon:
+      material: COD
+      custom-model-data: 1002
+      display-name: "&bCat Familiar"
+      lore:
+        - "&7A mysterious and agile companion"
+        - "&7with supernatural reflexes."
+        - ""
+        - "&eClick to summon!"
     mythicmob-id: WpetsCatFamiliar
     model-id: cat_familiar
     model-id-level30: cat_familiar_elder

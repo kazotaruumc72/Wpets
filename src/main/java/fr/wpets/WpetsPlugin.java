@@ -1,6 +1,7 @@
 package fr.wpets;
 
 import fr.wpets.command.PetsCommand;
+import fr.wpets.gui.PetSelectionGUI;
 import fr.wpets.gui.SkillTreeGUI;
 import fr.wpets.listener.EntityListener;
 import fr.wpets.listener.PlayerListener;
@@ -46,6 +47,7 @@ public class WpetsPlugin extends JavaPlugin {
 
     // ── GUI ──────────────────────────────────────────────────────────────────
     private SkillTreeGUI skillTreeGUI;
+    private PetSelectionGUI petSelectionGUI;
 
     /**
      * In-memory pet data cache.
@@ -87,6 +89,7 @@ public class WpetsPlugin extends JavaPlugin {
 
         // GUI (also a Listener)
         skillTreeGUI = new SkillTreeGUI(this);
+        petSelectionGUI = new PetSelectionGUI(this);
 
         // Commands
         PetsCommand cmd = new PetsCommand(this);
@@ -99,6 +102,7 @@ public class WpetsPlugin extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new PlayerListener(this), this);
         getServer().getPluginManager().registerEvents(new EntityListener(this), this);
         getServer().getPluginManager().registerEvents(skillTreeGUI, this);
+        getServer().getPluginManager().registerEvents(petSelectionGUI, this);
 
         // Background tasks
         petManager.startFollowTask();
@@ -275,5 +279,9 @@ public class WpetsPlugin extends JavaPlugin {
 
     public SkillTreeGUI getSkillTreeGUI() {
         return skillTreeGUI;
+    }
+
+    public PetSelectionGUI getPetSelectionGUI() {
+        return petSelectionGUI;
     }
 }

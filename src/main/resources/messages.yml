@@ -4,6 +4,7 @@
 prefix: "&8[&6Wpets&8] &r"
 
 no-permission: "&cYou don't have permission to do this."
+pet-no-permission: "&cYou don't have permission to summon the &6{pet} &cpet."
 plugin-reloaded: "&aWpets has been reloaded successfully."
 
 # Pet commands

@@ -63,6 +63,7 @@ public class PetsCommand implements CommandExecutor, TabCompleter {
             case "dismiss", "rappeler" -> handleDismiss(player);
             case "info"                -> handleInfo(player);
             case "skills", "competences" -> handleSkills(player);
+            case "menu", "selector"    -> handleMenu(player);
             case "help", "aide"        -> handleHelp(player);
             default -> {
                 MessageUtil.send(player, "invalid-args", "{usage}", "/" + label + " help");
@@ -89,6 +90,13 @@ public class PetsCommand implements CommandExecutor, TabCompleter {
         // Check if the pet type exists in pets.yml
         if (!plugin.getPetsConfig().contains("pets." + petId)) {
             MessageUtil.send(player, "pet-not-found", "{pet}", petId);
+            return true;
+        }
+
+        // Check per-pet permission if configured
+        String permission = plugin.getPetsConfig().getString("pets." + petId + ".permission");
+        if (permission != null && !permission.isEmpty() && !player.hasPermission(permission)) {
+            MessageUtil.send(player, "pet-no-permission", "{pet}", petId);
             return true;
         }
 
@@ -180,10 +188,23 @@ public class PetsCommand implements CommandExecutor, TabCompleter {
         return true;
     }
 
+    // ── /pet menu ────────────────────────────────────────────────────────────
+
+    private boolean handleMenu(Player player) {
+        if (!player.hasPermission("wpets.pet.menu")) {
+            MessageUtil.send(player, "no-permission");
+            return true;
+        }
+
+        plugin.getPetSelectionGUI().open(player);
+        return true;
+    }
+
     // ── /pet help ────────────────────────────────────────────────────────────
 
     private boolean handleHelp(Player player) {
         player.sendMessage(MessageUtil.colorize("&8&m----&r &6Wpets Help &8&m----"));
+        player.sendMessage(MessageUtil.colorize("&e/pet menu &7- Open the pet selection menu."));
         player.sendMessage(MessageUtil.colorize("&e/pet summon <id> &7- Summon your pet."));
         player.sendMessage(MessageUtil.colorize("&e/pet dismiss &7- Dismiss your active pet."));
         player.sendMessage(MessageUtil.colorize("&e/pet info &7- Show your pet's stats."));
@@ -325,7 +346,7 @@ public class PetsCommand implements CommandExecutor, TabCompleter {
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
         if (command.getName().equalsIgnoreCase("pet")) {
             if (args.length == 1) {
-                return filter(List.of("summon", "dismiss", "info", "skills", "help"), args[0]);
+                return filter(List.of("menu", "summon", "dismiss", "info", "skills", "help"), args[0]);
             }
             if (args.length == 2 && args[0].equalsIgnoreCase("summon")) {
                 return filter(getPetIds(), args[1]);

@@ -33,3 +33,12 @@ permissions:
   wpets.pet.skills:
     description: Allows a player to open the skill tree GUI.
     default: true
+  wpets.pet.menu:
+    description: Allows a player to open the pet selection menu.
+    default: true
+  wpets.pet.wolf_guardian:
+    description: Allows a player to summon the Wolf Guardian pet.
+    default: true
+  wpets.pet.cat_familiar:
+    description: Allows a player to summon the Cat Familiar pet.
+    default: true
