@@ -280,7 +280,7 @@ public class PetManager {
             var modeledEntity = com.ticxo.modelengine.api.ModelEngineAPI.getOrCreateModeledEntity(entity);
             // Remove all existing models first
             for (var model : new java.util.ArrayList<>(modeledEntity.getModels().values())) {
-                modeledEntity.removeModel(model.getBlueprint().getId());
+                modeledEntity.removeModel(model.getBlueprint().getName());
             }
             var blueprint = com.ticxo.modelengine.api.ModelEngineAPI.getBlueprint(modelId);
             if (blueprint != null) {
