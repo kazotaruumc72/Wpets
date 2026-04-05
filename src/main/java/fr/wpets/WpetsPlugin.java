@@ -308,6 +308,8 @@ public class WpetsPlugin extends JavaPlugin {
      */
     public PetData getPetData(UUID playerUuid, String petId) {
         return getCachedPetData(playerUuid, petId);
+    }
+
     public HologramManager getHologramManager() {
         return hologramManager;
     }
