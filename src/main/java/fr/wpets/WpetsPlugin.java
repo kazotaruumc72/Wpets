@@ -105,6 +105,7 @@ public class WpetsPlugin extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new EntityListener(this), this);
         getServer().getPluginManager().registerEvents(skillTreeGUI, this);
         getServer().getPluginManager().registerEvents(petSelectionGUI, this);
+        getServer().getPluginManager().registerEvents(hologramManager, this);
 
         // Background tasks
         petManager.startFollowTask();
@@ -131,6 +132,7 @@ public class WpetsPlugin extends JavaPlugin {
 
         // Remove all holograms
         if (hologramManager != null) {
+            hologramManager.stopUpdateTask();
             hologramManager.removeAll();
         }
 

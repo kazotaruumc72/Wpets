@@ -327,6 +327,14 @@ public class PetManager {
     }
 
     /**
+     * Returns the active pets map for hologram recreation.
+     * Package-private to allow HologramManager access.
+     */
+    Map<UUID, UUID> getActivePetsMap() {
+        return activePets;
+    }
+
+    /**
      * Returns the player UUID that owns the given mob entity, or {@code null}.
      */
     public UUID getOwnerByMobUuid(UUID mobUuid) {
