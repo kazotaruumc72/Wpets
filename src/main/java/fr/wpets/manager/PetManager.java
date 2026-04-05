@@ -259,20 +259,14 @@ public class PetManager {
     // ── ModelEngine ──────────────────────────────────────────────────────────
 
     /**
-     * Applies the correct ModelEngine model based on the pet's current level.
+     * Applies the correct ModelEngine model based on the pet configuration.
      * Does nothing if ModelEngine integration is disabled in config.
      */
     public void applyModel(Entity entity, ConfigurationSection petSec, PetData petData) {
         if (!plugin.getConfig().getBoolean("modelengine-enabled", false)) return;
         if (!isModelEngineAvailable()) return;
 
-        int level = petData.getLevel();
         String modelId = petSec.getString("model-id", "");
-        if (level >= 100) {
-            modelId = petSec.getString("model-id-level100", modelId);
-        } else if (level >= 30) {
-            modelId = petSec.getString("model-id-level30", modelId);
-        }
 
         if (modelId.isBlank()) return;
 
