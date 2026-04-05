@@ -1,5 +1,61 @@
 # Build Troubleshooting Guide
 
+## ZIP END Header Error (Corrupted JAR Files)
+
+If you encounter errors like:
+```
+error reading C:\Users\...\ChatColorHandler-v2.5.3.jar; zip END header not found
+ZipException opening "ChatColorHandler-v2.5.3.jar": zip END header not found
+```
+
+This indicates a **corrupted JAR file** in your local Maven repository.
+
+### Root Cause
+Maven downloaded a dependency JAR file, but the download was interrupted or corrupted. Maven stores these files in `~/.m2/repository` (Linux/Mac) or `C:\Users\<username>\.m2\repository` (Windows).
+
+### Solution: Clean Corrupted Dependencies
+
+**Option 1: Delete Specific Corrupted Dependency (Recommended)**
+```bash
+# Windows (PowerShell)
+Remove-Item -Recurse -Force "$env:USERPROFILE\.m2\repository\me\dave\ChatColorHandler"
+
+# Linux/Mac
+rm -rf ~/.m2/repository/me/dave/ChatColorHandler
+```
+
+**Option 2: Clean All Failed Downloads**
+```bash
+# Windows (PowerShell) - Remove failed download markers
+Get-ChildItem -Path "$env:USERPROFILE\.m2\repository" -Recurse -Filter "*.lastUpdated" | Remove-Item -Force
+Get-ChildItem -Path "$env:USERPROFILE\.m2\repository" -Recurse -Filter "resolver-status.properties" | Remove-Item -Force
+
+# Linux/Mac
+find ~/.m2/repository -name "*.lastUpdated" -delete
+find ~/.m2/repository -name "resolver-status.properties" -delete
+```
+
+**Option 3: Complete Maven Cache Clean (Nuclear Option)**
+```bash
+# Windows
+mvn dependency:purge-local-repository -DreResolve=true
+
+# Linux/Mac
+mvn dependency:purge-local-repository -DreResolve=true
+```
+
+**After Cleaning, Rebuild:**
+```bash
+mvn clean compile
+```
+
+### Prevention
+- Ensure stable internet connection during Maven builds
+- If build fails mid-download, always clean before retrying
+- Use `mvn clean compile` instead of just `mvn compile` after network issues
+
+---
+
 ## Dependency Resolution Errors
 
 If you encounter errors like:

@@ -17,3 +17,20 @@ mvn clean package
 
 ### Network Requirements
 If you encounter dependency resolution errors, ensure your network environment allows access to the above repositories. DNS resolution must work for these domains.
+
+### Troubleshooting Build Issues
+
+If you encounter build errors such as:
+- `zip END header not found` - Corrupted JAR files in Maven cache
+- `Could not resolve dependencies` - Network or repository access issues
+
+See the [BUILD_TROUBLESHOOTING.md](BUILD_TROUBLESHOOTING.md) guide for detailed solutions.
+
+**Quick Fix for Corrupted Dependencies:**
+```bash
+# Linux/Mac
+./clean-maven-cache.sh
+
+# Windows
+clean-maven-cache.bat
+```
