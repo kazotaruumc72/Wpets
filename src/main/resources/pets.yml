@@ -23,8 +23,6 @@ pets:
     mythicmob-id: WpetsWolfGuardian
     # ModelEngine model id (leave empty to use default mob model)
     model-id: wolf_guardian
-    model-id-level30: wolf_guardian_elder
-    model-id-level100: wolf_guardian_corrupted
     # Base statistics (at level 1)
     base-stats:
       max-health: 20.0
@@ -65,8 +63,6 @@ pets:
         - "&eClick to summon!"
     mythicmob-id: WpetsCatFamiliar
     model-id: cat_familiar
-    model-id-level30: cat_familiar_elder
-    model-id-level100: cat_familiar_divine
     base-stats:
       max-health: 15.0
       damage: 3.0
