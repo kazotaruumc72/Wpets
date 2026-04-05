@@ -18,22 +18,22 @@
     </properties>
 
     <repositories>
-        <!-- Paper API -->
+        <!-- Paper API - Required for Minecraft server API -->
         <repository>
             <id>papermc</id>
             <url>https://repo.papermc.io/repository/maven-public/</url>
         </repository>
-        <!-- MythicMobs -->
+        <!-- MythicMobs & ModelEngine - Required for mob and model integration -->
         <repository>
             <id>lumine-repo</id>
             <url>https://mvn.lumine.io/repository/maven-public/</url>
         </repository>
-        <!-- CodeMC for various dependencies -->
+        <!-- CodeMC - Additional Minecraft plugin dependencies -->
         <repository>
             <id>codemc-repo</id>
             <url>https://repo.codemc.io/repository/maven-public/</url>
         </repository>
-        <!-- FancyHolograms -->
+        <!-- FancyHolograms - Required for hologram display functionality -->
         <repository>
             <id>fancyplugins-releases</id>
             <url>https://repo.fancyplugins.de/releases</url>
