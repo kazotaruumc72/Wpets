@@ -44,6 +44,7 @@ public class WpetsPlugin extends JavaPlugin {
     private ExperienceManager experienceManager;
     private SkillManager skillManager;
     private MilestoneManager milestoneManager;
+    private HologramManager hologramManager;
 
     // ── GUI ──────────────────────────────────────────────────────────────────
     private SkillTreeGUI skillTreeGUI;
@@ -84,6 +85,7 @@ public class WpetsPlugin extends JavaPlugin {
         petManager      = new PetManager(this);
         experienceManager = new ExperienceManager(this);
         milestoneManager  = new MilestoneManager(this);
+        hologramManager   = new HologramManager(this);
 
         skillManager.load();
 
@@ -106,6 +108,7 @@ public class WpetsPlugin extends JavaPlugin {
 
         // Background tasks
         petManager.startFollowTask();
+        hologramManager.startUpdateTask();
         startAutoSaveTask();
 
         getLogger().info("Wpets v" + getDescription().getVersion() + " enabled successfully.");
@@ -124,6 +127,11 @@ public class WpetsPlugin extends JavaPlugin {
         // Despawn all pets
         if (petManager != null) {
             petManager.despawnAll();
+        }
+
+        // Remove all holograms
+        if (hologramManager != null) {
+            hologramManager.removeAll();
         }
 
         // Close the DB connection
@@ -283,5 +291,9 @@ public class WpetsPlugin extends JavaPlugin {
 
     public PetSelectionGUI getPetSelectionGUI() {
         return petSelectionGUI;
+    }
+
+    public HologramManager getHologramManager() {
+        return hologramManager;
     }
 }

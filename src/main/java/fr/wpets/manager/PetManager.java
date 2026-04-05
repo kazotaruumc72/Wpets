@@ -81,6 +81,9 @@ public class PetManager {
      */
     public void despawnAll() {
         for (UUID mobUuid : new ArrayList<>(activePets.values())) {
+            // Remove hologram first
+            plugin.getHologramManager().removeHologram(mobUuid);
+
             Entity e = Bukkit.getEntity(mobUuid);
             if (e != null) {
                 e.remove();
@@ -152,6 +155,10 @@ public class PetManager {
             // Apply active skill effects (e.g. particles at level 10+)
             plugin.getMilestoneManager().applyPassiveEffects(player, petData, entity);
 
+            // Create hologram above the pet
+            String petDisplayName = petSec.getString("display-name", petId);
+            plugin.getHologramManager().createHologram(entity, petDisplayName);
+
             return true;
 
         } catch (Exception e) {
@@ -167,6 +174,9 @@ public class PetManager {
         UUID mobUuid = activePets.remove(player.getUniqueId());
         activePetTypes.remove(player.getUniqueId());
         if (mobUuid != null) {
+            // Remove hologram first
+            plugin.getHologramManager().removeHologram(mobUuid);
+
             Entity e = Bukkit.getEntity(mobUuid);
             if (e != null) {
                 e.remove();
@@ -333,8 +343,13 @@ public class PetManager {
      * tracking maps without calling {@link Entity#remove()} again.
      */
     public void onPetEntityDied(UUID ownerUuid) {
-        activePets.remove(ownerUuid);
+        UUID mobUuid = activePets.remove(ownerUuid);
         activePetTypes.remove(ownerUuid);
+
+        // Remove hologram when pet dies
+        if (mobUuid != null) {
+            plugin.getHologramManager().removeHologram(mobUuid);
+        }
     }
 
     // ── Helpers ──────────────────────────────────────────────────────────────
