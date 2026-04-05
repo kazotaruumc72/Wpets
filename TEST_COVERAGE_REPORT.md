@@ -79,10 +79,12 @@ src/main/java/fr/wpets/
 <dependency>
     <groupId>org.assertj</groupId>
     <artifactId>assertj-core</artifactId>
-    <version>3.24.2</version>
+    <version>3.27.7</version>
     <scope>test</scope>
 </dependency>
 ```
+
+**Security Note**: AssertJ version 3.27.7 is used to address CVE affecting versions 1.4.0-3.27.6 (XML External Entity vulnerability in `isXmlEqualTo` assertion).
 
 ### Test Directory Structure Created
 ```
