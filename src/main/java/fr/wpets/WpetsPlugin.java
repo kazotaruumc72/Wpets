@@ -1,6 +1,7 @@
 package fr.wpets;
 
 import fr.wpets.command.PetsCommand;
+import fr.wpets.gui.PetContextMenuGUI;
 import fr.wpets.gui.PetSelectionGUI;
 import fr.wpets.gui.SkillTreeGUI;
 import fr.wpets.listener.EntityListener;
@@ -49,6 +50,7 @@ public class WpetsPlugin extends JavaPlugin {
     // ── GUI ──────────────────────────────────────────────────────────────────
     private SkillTreeGUI skillTreeGUI;
     private PetSelectionGUI petSelectionGUI;
+    private PetContextMenuGUI petContextMenuGUI;
 
     /**
      * In-memory pet data cache.
@@ -92,6 +94,7 @@ public class WpetsPlugin extends JavaPlugin {
         // GUI (also a Listener)
         skillTreeGUI = new SkillTreeGUI(this);
         petSelectionGUI = new PetSelectionGUI(this);
+        petContextMenuGUI = new PetContextMenuGUI(this);
 
         // Commands
         PetsCommand cmd = new PetsCommand(this);
@@ -105,6 +108,7 @@ public class WpetsPlugin extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new EntityListener(this), this);
         getServer().getPluginManager().registerEvents(skillTreeGUI, this);
         getServer().getPluginManager().registerEvents(petSelectionGUI, this);
+        getServer().getPluginManager().registerEvents(petContextMenuGUI, this);
         getServer().getPluginManager().registerEvents(hologramManager, this);
 
         // Background tasks
@@ -295,6 +299,15 @@ public class WpetsPlugin extends JavaPlugin {
         return petSelectionGUI;
     }
 
+    public PetContextMenuGUI getPetContextMenuGUI() {
+        return petContextMenuGUI;
+    }
+
+    /**
+     * Helper to get pet data from the cache (no auto-creation).
+     */
+    public PetData getPetData(UUID playerUuid, String petId) {
+        return getCachedPetData(playerUuid, petId);
     public HologramManager getHologramManager() {
         return hologramManager;
     }

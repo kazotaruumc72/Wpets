@@ -12,6 +12,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
@@ -92,7 +93,9 @@ public class PlayerListener implements Listener {
     // ── Feeding XP ───────────────────────────────────────────────────────────
 
     /**
-     * Detects right-click on the active pet entity while holding the feed item.
+     * Detects right-click on the active pet entity.
+     * - Shift-right-click: Opens the pet context menu
+     * - Regular right-click with feed item: Feeds the pet
      */
     @EventHandler(priority = EventPriority.NORMAL)
     public void onFeedPet(PlayerInteractEntityEvent event) {
@@ -105,6 +108,13 @@ public class PlayerListener implements Listener {
 
         UUID activePetEntityUuid = plugin.getPetManager().getActivePetEntityUuid(uuid);
         if (!event.getRightClicked().getUniqueId().equals(activePetEntityUuid)) return;
+
+        // Check for shift-right-click to open context menu
+        if (player.isSneaking()) {
+            plugin.getPetContextMenuGUI().open(player);
+            event.setCancelled(true);
+            return;
+        }
 
         String petId = plugin.getPetManager().getActivePetTypeId(uuid);
         if (petId == null) return;
@@ -131,5 +141,42 @@ public class PlayerListener implements Listener {
 
         plugin.getExperienceManager().grantXP(player, "feeding");
         event.setCancelled(true);
+    }
+
+    // ── Pet Renaming ─────────────────────────────────────────────────────────
+
+    /**
+     * Handles chat input for pet renaming.
+     */
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onChat(AsyncPlayerChatEvent event) {
+        Player player = event.getPlayer();
+        UUID uuid = player.getUniqueId();
+
+        if (plugin.getPetManager().isAwaitingRename(uuid)) {
+            event.setCancelled(true);
+
+            String newName = event.getMessage().trim();
+
+            // Allow "cancel" to abort the rename
+            if (newName.equalsIgnoreCase("cancel")) {
+                plugin.getPetManager().cancelRename(uuid);
+                player.sendMessage(MessageUtil.getMessage("pet-rename-cancelled"));
+                return;
+            }
+
+            // Limit name length
+            if (newName.length() > 32) {
+                newName = newName.substring(0, 32);
+            }
+
+            // Complete the rename on the main thread (chat event is async)
+            String finalName = newName;
+            plugin.getServer().getScheduler().runTask(plugin, () -> {
+                plugin.getPetManager().completeRename(player, finalName);
+                player.sendMessage(MessageUtil.getMessage("pet-renamed")
+                        .replace("{name}", finalName));
+            });
+        }
     }
 }

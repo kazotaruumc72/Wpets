@@ -41,6 +41,15 @@ public class PetManager {
     /** Maps player UUID → pet type id (e.g. "wolf_guardian") */
     private final Map<UUID, String> activePetTypes = new HashMap<>();
 
+    /** Maps player UUID → mounted state */
+    private final Map<UUID, Boolean> mountedPlayers = new HashMap<>();
+
+    /** Maps player UUID → follow state (true = following, false = stay) */
+    private final Map<UUID, Boolean> followingState = new HashMap<>();
+
+    /** Maps player UUID → awaiting rename (used for chat input) */
+    private final Set<UUID> awaitingRename = new HashSet<>();
+
     public PetManager(WpetsPlugin plugin) {
         this.plugin = plugin;
     }
@@ -58,6 +67,9 @@ public class PetManager {
                 for (Map.Entry<UUID, UUID> entry : new HashMap<>(activePets).entrySet()) {
                     Player player = Bukkit.getPlayer(entry.getKey());
                     if (player == null || !player.isOnline()) continue;
+
+                    // Check if following is disabled
+                    if (!isFollowing(entry.getKey())) continue;
 
                     Entity petEntity = Bukkit.getEntity(entry.getValue());
                     if (petEntity == null || !petEntity.isValid()) {
@@ -146,6 +158,9 @@ public class PetManager {
             activePets.put(player.getUniqueId(), entity.getUniqueId());
             activePetTypes.put(player.getUniqueId(), petId);
 
+            // Initialize follow state as enabled by default
+            followingState.put(player.getUniqueId(), true);
+
             // Apply statistics based on level
             applyStats(entity, petSec, petData);
 
@@ -171,14 +186,22 @@ public class PetManager {
      * Despawns the active pet for the given player.
      */
     public void dismissPet(Player player) {
-        UUID mobUuid = activePets.remove(player.getUniqueId());
-        activePetTypes.remove(player.getUniqueId());
+        UUID uuid = player.getUniqueId();
+        UUID mobUuid = activePets.remove(uuid);
+        activePetTypes.remove(uuid);
+        mountedPlayers.remove(uuid);
+        followingState.remove(uuid);
+
         if (mobUuid != null) {
             // Remove hologram first
             plugin.getHologramManager().removeHologram(mobUuid);
 
             Entity e = Bukkit.getEntity(mobUuid);
             if (e != null) {
+                // Dismount player if mounted
+                if (e.getPassengers().contains(player)) {
+                    e.removePassenger(player);
+                }
                 e.remove();
             }
         }
@@ -353,6 +376,103 @@ public class PetManager {
     public void onPetEntityDied(UUID ownerUuid) {
         UUID mobUuid = activePets.remove(ownerUuid);
         activePetTypes.remove(ownerUuid);
+        mountedPlayers.remove(ownerUuid);
+        followingState.remove(ownerUuid);
+    }
+
+    // ── Mounting & Following ─────────────────────────────────────────────────
+
+    /**
+     * Checks if the player is currently mounted on their pet.
+     */
+    public boolean isMounted(UUID playerUuid) {
+        return mountedPlayers.getOrDefault(playerUuid, false);
+    }
+
+    /**
+     * Mounts the player on their active pet.
+     */
+    public void mount(Player player) {
+        UUID uuid = player.getUniqueId();
+        UUID petEntityUuid = activePets.get(uuid);
+        if (petEntityUuid == null) return;
+
+        Entity petEntity = Bukkit.getEntity(petEntityUuid);
+        if (petEntity == null) return;
+
+        petEntity.addPassenger(player);
+        mountedPlayers.put(uuid, true);
+    }
+
+    /**
+     * Dismounts the player from their active pet.
+     */
+    public void dismount(Player player) {
+        UUID uuid = player.getUniqueId();
+        UUID petEntityUuid = activePets.get(uuid);
+        if (petEntityUuid == null) return;
+
+        Entity petEntity = Bukkit.getEntity(petEntityUuid);
+        if (petEntity != null && petEntity.getPassengers().contains(player)) {
+            petEntity.removePassenger(player);
+        }
+        mountedPlayers.put(uuid, false);
+    }
+
+    /**
+     * Checks if the pet is currently following the player.
+     * Returns true by default if not explicitly set.
+     */
+    public boolean isFollowing(UUID playerUuid) {
+        return followingState.getOrDefault(playerUuid, true);
+    }
+
+    /**
+     * Sets whether the pet should follow the player.
+     */
+    public void setFollowing(UUID playerUuid, boolean following) {
+        followingState.put(playerUuid, following);
+    }
+
+    // ── Pet Renaming ─────────────────────────────────────────────────────────
+
+    /**
+     * Starts the rename process for the player's active pet.
+     * The player will be prompted to type the new name in chat.
+     */
+    public void startRenameProcess(Player player) {
+        awaitingRename.add(player.getUniqueId());
+    }
+
+    /**
+     * Checks if the player is currently in the rename process.
+     */
+    public boolean isAwaitingRename(UUID playerUuid) {
+        return awaitingRename.contains(playerUuid);
+    }
+
+    /**
+     * Completes the rename process with the given name.
+     */
+    public void completeRename(Player player, String newName) {
+        UUID uuid = player.getUniqueId();
+        awaitingRename.remove(uuid);
+
+        UUID petEntityUuid = activePets.get(uuid);
+        if (petEntityUuid == null) return;
+
+        Entity petEntity = Bukkit.getEntity(petEntityUuid);
+        if (petEntity != null) {
+            petEntity.setCustomName(MessageUtil.colorize(newName));
+            petEntity.setCustomNameVisible(true);
+        }
+    }
+
+    /**
+     * Cancels the rename process.
+     */
+    public void cancelRename(UUID playerUuid) {
+        awaitingRename.remove(playerUuid);
 
         // Remove hologram when pet dies
         if (mobUuid != null) {
