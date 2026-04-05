@@ -3,7 +3,6 @@
 # ==========================================
 # Each entry defines one pet type.
 # 'mythicmob-id' is the internal name used in MythicMobs mobs.yml
-# 'model-id' is the model name registered in ModelEngine
 
 pets:
   wolf_guardian:
@@ -21,12 +20,6 @@ pets:
         - ""
         - "&eClick to summon!"
     mythicmob-id: WpetsWolfGuardian
-    # ModelEngine model id (leave empty to use default mob model)
-    model-id: wolf_guardian
-    # Model evolution at level 30 (leave empty to keep base model)
-    model-id-level30: wolf_guardian_elite
-    # Model evolution at level 100 (leave empty to keep previous model)
-    model-id-level100: wolf_guardian_corrupted
     # Statistics per level (1-100)
     # Each level defines: max-health, damage, speed, armor
     levels:
@@ -105,11 +98,6 @@ pets:
         - ""
         - "&eClick to summon!"
     mythicmob-id: WpetsCatFamiliar
-    model-id: cat_familiar
-    # Model evolution at level 30 (leave empty to keep base model)
-    model-id-level30: cat_familiar_mystic
-    # Model evolution at level 100 (leave empty to keep previous model)
-    model-id-level100: cat_familiar_corrupted
     # Statistics per level (1-100)
     # Each level defines: max-health, damage, speed, armor
     levels:
