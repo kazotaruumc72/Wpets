@@ -259,14 +259,43 @@ public class PetManager {
     // ── ModelEngine ──────────────────────────────────────────────────────────
 
     /**
-     * Applies the correct ModelEngine model based on the pet configuration.
+     * Applies the correct ModelEngine model based on the pet configuration and level.
      * Does nothing if ModelEngine integration is disabled in config.
+     *
+     * <p>Model selection priority:
+     * <ul>
+     *   <li>Level 100+: uses 'model-id-level100' if defined, otherwise 'model-id-level30' if defined, otherwise 'model-id'</li>
+     *   <li>Level 30-99: uses 'model-id-level30' if defined, otherwise 'model-id'</li>
+     *   <li>Level 1-29: uses 'model-id'</li>
+     * </ul>
      */
     public void applyModel(Entity entity, ConfigurationSection petSec, PetData petData) {
         if (!plugin.getConfig().getBoolean("modelengine-enabled", false)) return;
         if (!isModelEngineAvailable()) return;
 
-        String modelId = petSec.getString("model-id", "");
+        // Select the appropriate model based on level
+        String modelId;
+        int level = petData.getLevel();
+
+        if (level >= 100) {
+            // Try level 100 model first, fall back to level 30, then base
+            modelId = petSec.getString("model-id-level100", "");
+            if (modelId.isBlank()) {
+                modelId = petSec.getString("model-id-level30", "");
+            }
+            if (modelId.isBlank()) {
+                modelId = petSec.getString("model-id", "");
+            }
+        } else if (level >= 30) {
+            // Try level 30 model first, fall back to base
+            modelId = petSec.getString("model-id-level30", "");
+            if (modelId.isBlank()) {
+                modelId = petSec.getString("model-id", "");
+            }
+        } else {
+            // Use base model for levels 1-29
+            modelId = petSec.getString("model-id", "");
+        }
 
         if (modelId.isBlank()) return;
 
