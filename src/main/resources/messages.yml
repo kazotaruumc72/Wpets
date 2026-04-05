@@ -43,6 +43,15 @@ pet-info-damage: "&7Damage: &6{damage}"
 pet-info-speed: "&7Speed: &6{speed}"
 pet-info-armor: "&7Armor: &6{armor}"
 
+# Pet Context Menu
+pet-mounted: "&aYou mounted your pet!"
+pet-dismounted: "&aYou dismounted from your pet."
+pet-follow-enabled: "&aYour pet is now following you!"
+pet-follow-disabled: "&aYour pet will now stay in place."
+pet-rename-prompt: "&eType the new name for your pet in chat:"
+pet-renamed: "&aYour pet has been renamed to &6{name}&a!"
+pet-rename-cancelled: "&cPet rename cancelled."
+
 # Admin
 admin-set-level: "&aSet {player}'s pet &6{pet} &ato level &6{level}&a."
 admin-give-xp: "&aGave &6{xp} &aXP to {player}'s pet &6{pet}&a."
