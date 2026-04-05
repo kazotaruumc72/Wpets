@@ -177,7 +177,8 @@ public class PetManager {
     // ── Statistics ───────────────────────────────────────────────────────────
 
     /**
-     * Applies level-scaled statistics to the entity using Bukkit's attribute API.
+     * Applies level-specific statistics to the entity using Bukkit's attribute API.
+     * Stats are read from the per-level configuration in pets.yml.
      * Also sets MythicMobs internal variables for damage/level so that MythicMobs
      * skills can use them.
      */
@@ -185,22 +186,46 @@ public class PetManager {
         if (!(entity instanceof LivingEntity living)) return;
 
         int level = petData.getLevel();
-        double multiplier = petSec.getDouble("stats-multiplier", 1.0);
 
-        ConfigurationSection base = petSec.getConfigurationSection("base-stats");
-        ConfigurationSection perLevel = petSec.getConfigurationSection("stats-per-level");
+        // Get the levels section
+        ConfigurationSection levelsSection = petSec.getConfigurationSection("levels");
+        if (levelsSection == null) {
+            plugin.getLogger().warning("No 'levels' section found for pet: " + petData.getPetId());
+            return;
+        }
 
-        double baseHealth = base != null ? base.getDouble("max-health", 20) : 20;
-        double healthPerLvl = perLevel != null ? perLevel.getDouble("max-health", 2) : 2;
-        double baseSpeed = base != null ? base.getDouble("speed", 0.3) : 0.3;
-        double speedPerLvl = perLevel != null ? perLevel.getDouble("speed", 0.002) : 0.002;
+        // Try to get exact level stats, or find the closest lower level
+        ConfigurationSection levelStats = levelsSection.getConfigurationSection(String.valueOf(level));
+        if (levelStats == null) {
+            // Find the closest lower level that has stats defined
+            int closestLevel = 1;
+            for (String key : levelsSection.getKeys(false)) {
+                try {
+                    int definedLevel = Integer.parseInt(key);
+                    if (definedLevel <= level && definedLevel > closestLevel) {
+                        closestLevel = definedLevel;
+                    }
+                } catch (NumberFormatException ignored) {
+                }
+            }
+            levelStats = levelsSection.getConfigurationSection(String.valueOf(closestLevel));
+            if (levelStats == null) {
+                plugin.getLogger().warning("No stats found for level " + level + " or any lower level for pet: " + petData.getPetId());
+                return;
+            }
+        }
 
-        double maxHealth = (baseHealth + (level - 1) * healthPerLvl) * multiplier;
-        double speed = (baseSpeed + (level - 1) * speedPerLvl) * multiplier;
+        // Read stats from configuration
+        double maxHealth = levelStats.getDouble("max-health", 20.0);
+        double speed = levelStats.getDouble("speed", 0.3);
+        double armor = levelStats.getDouble("armor", 2.0);
+        double damage = levelStats.getDouble("damage", 4.0);
 
         // Apply skill stat bonuses
         maxHealth = applySkillBonuses(maxHealth, "health", petData);
         speed = applySkillBonuses(speed, "speed", petData);
+        armor = applySkillBonuses(armor, "armor", petData);
+        damage = applySkillBonuses(damage, "damage", petData);
 
         // Set health attribute
         var healthAttr = living.getAttribute(Attribute.MAX_HEALTH);
@@ -216,9 +241,6 @@ public class PetManager {
         }
 
         // Set armor attribute
-        double baseArmor = base != null ? base.getDouble("armor", 2) : 2;
-        double armorPerLvl = perLevel != null ? perLevel.getDouble("armor", 0.1) : 0.1;
-        double armor = applySkillBonuses((baseArmor + (level - 1) * armorPerLvl) * multiplier, "armor", petData);
         var armorAttr = living.getAttribute(Attribute.ARMOR);
         if (armorAttr != null) {
             armorAttr.setBaseValue(Math.max(0, armor));
@@ -231,6 +253,8 @@ public class PetManager {
                 amOpt.ifPresent(am -> {
                     // Set mob level so MythicMobs applies level-appropriate mechanics
                     am.setLevel(level);
+                    // Note: damage is now stored in the level stats but MythicMobs
+                    // will handle damage through its own skill system
                 });
             } catch (Exception e) {
                 plugin.getLogger().log(Level.WARNING, "Failed to set MythicMobs mob level", e);
@@ -259,14 +283,43 @@ public class PetManager {
     // ── ModelEngine ──────────────────────────────────────────────────────────
 
     /**
-     * Applies the correct ModelEngine model based on the pet configuration.
+     * Applies the correct ModelEngine model based on the pet configuration and level.
      * Does nothing if ModelEngine integration is disabled in config.
+     *
+     * <p>Model selection priority:
+     * <ul>
+     *   <li>Level 100+: uses 'model-id-level100' if defined, otherwise 'model-id-level30' if defined, otherwise 'model-id'</li>
+     *   <li>Level 30-99: uses 'model-id-level30' if defined, otherwise 'model-id'</li>
+     *   <li>Level 1-29: uses 'model-id'</li>
+     * </ul>
      */
     public void applyModel(Entity entity, ConfigurationSection petSec, PetData petData) {
         if (!plugin.getConfig().getBoolean("modelengine-enabled", false)) return;
         if (!isModelEngineAvailable()) return;
 
-        String modelId = petSec.getString("model-id", "");
+        // Select the appropriate model based on level
+        String modelId;
+        int level = petData.getLevel();
+
+        if (level >= 100) {
+            // Try level 100 model first, fall back to level 30, then base
+            modelId = petSec.getString("model-id-level100", "");
+            if (modelId.isBlank()) {
+                modelId = petSec.getString("model-id-level30", "");
+            }
+            if (modelId.isBlank()) {
+                modelId = petSec.getString("model-id", "");
+            }
+        } else if (level >= 30) {
+            // Try level 30 model first, fall back to base
+            modelId = petSec.getString("model-id-level30", "");
+            if (modelId.isBlank()) {
+                modelId = petSec.getString("model-id", "");
+            }
+        } else {
+            // Use base model for levels 1-29
+            modelId = petSec.getString("model-id", "");
+        }
 
         if (modelId.isBlank()) return;
 
