@@ -33,6 +33,11 @@
             <id>codemc-repo</id>
             <url>https://repo.codemc.io/repository/maven-public/</url>
         </repository>
+        <!-- FancyHolograms -->
+        <repository>
+            <id>fancyplugins-releases</id>
+            <url>https://repo.fancyplugins.de/releases</url>
+        </repository>
     </repositories>
 
     <dependencies>
@@ -57,6 +62,14 @@
             <groupId>com.ticxo.modelengine</groupId>
             <artifactId>ModelEngine</artifactId>
             <version>R4.0.9</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- FancyHolograms -->
+        <dependency>
+            <groupId>de.oliver</groupId>
+            <artifactId>FancyHolograms</artifactId>
+            <version>2.3.0</version>
             <scope>provided</scope>
         </dependency>
 

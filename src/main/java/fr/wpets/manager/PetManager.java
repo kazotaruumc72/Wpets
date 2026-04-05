@@ -93,6 +93,9 @@ public class PetManager {
      */
     public void despawnAll() {
         for (UUID mobUuid : new ArrayList<>(activePets.values())) {
+            // Remove hologram first
+            plugin.getHologramManager().removeHologram(mobUuid);
+
             Entity e = Bukkit.getEntity(mobUuid);
             if (e != null) {
                 e.remove();
@@ -167,6 +170,10 @@ public class PetManager {
             // Apply active skill effects (e.g. particles at level 10+)
             plugin.getMilestoneManager().applyPassiveEffects(player, petData, entity);
 
+            // Create hologram above the pet
+            String petDisplayName = petSec.getString("display-name", petId);
+            plugin.getHologramManager().createHologram(entity, petDisplayName);
+
             return true;
 
         } catch (Exception e) {
@@ -186,6 +193,9 @@ public class PetManager {
         followingState.remove(uuid);
 
         if (mobUuid != null) {
+            // Remove hologram first
+            plugin.getHologramManager().removeHologram(mobUuid);
+
             Entity e = Bukkit.getEntity(mobUuid);
             if (e != null) {
                 // Dismount player if mounted
@@ -340,6 +350,14 @@ public class PetManager {
     }
 
     /**
+     * Returns the active pets map for hologram recreation.
+     * Package-private to allow HologramManager access.
+     */
+    Map<UUID, UUID> getActivePetsMap() {
+        return activePets;
+    }
+
+    /**
      * Returns the player UUID that owns the given mob entity, or {@code null}.
      */
     public UUID getOwnerByMobUuid(UUID mobUuid) {
@@ -356,7 +374,7 @@ public class PetManager {
      * tracking maps without calling {@link Entity#remove()} again.
      */
     public void onPetEntityDied(UUID ownerUuid) {
-        activePets.remove(ownerUuid);
+        UUID mobUuid = activePets.remove(ownerUuid);
         activePetTypes.remove(ownerUuid);
         mountedPlayers.remove(ownerUuid);
         followingState.remove(ownerUuid);
@@ -455,6 +473,11 @@ public class PetManager {
      */
     public void cancelRename(UUID playerUuid) {
         awaitingRename.remove(playerUuid);
+
+        // Remove hologram when pet dies
+        if (mobUuid != null) {
+            plugin.getHologramManager().removeHologram(mobUuid);
+        }
     }
 
     // ── Helpers ──────────────────────────────────────────────────────────────
