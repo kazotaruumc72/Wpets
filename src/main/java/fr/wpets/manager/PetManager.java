@@ -690,7 +690,11 @@ public class PetManager {
         // Get player's horizontal look direction
         org.bukkit.util.Vector direction = player.getLocation().getDirection();
         direction.setY(0);
-        if (direction.lengthSquared() < 0.001) return; // Looking straight up/down – stand still
+        if (direction.lengthSquared() < 0.001) {
+            // Looking straight up/down – stop the pet
+            petEntity.setVelocity(new org.bukkit.util.Vector(0, petEntity.getVelocity().getY(), 0));
+            return;
+        }
         direction.normalize();
 
         // Pet speed attribute
@@ -700,7 +704,9 @@ public class PetManager {
             speed = speedAttr.getValue();
         }
 
-        // Scale to a usable velocity magnitude
+        // The MOVEMENT_SPEED attribute (typically ~0.3) represents blocks/tick at a low
+        // scale.  Multiplying by 2.5 converts it to a velocity magnitude that produces
+        // natural-feeling walk/run movement when applied every tick.
         double moveSpeed = speed * 2.5;
 
         org.bukkit.util.Vector velocity = direction.multiply(moveSpeed);
@@ -712,7 +718,7 @@ public class PetManager {
         if (petEntity.isOnGround()) {
             Location ahead = petEntity.getLocation().clone().add(direction.clone().multiply(0.6));
             if (ahead.getBlock().getType().isSolid()) {
-                velocity.setY(0.42); // Standard jump height
+                velocity.setY(0.42); // Minecraft's default player/mob jump velocity
             }
         }
 
