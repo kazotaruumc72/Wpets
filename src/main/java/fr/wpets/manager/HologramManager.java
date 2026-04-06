@@ -86,10 +86,13 @@ public class HologramManager implements Listener {
             }
 
             // Create and spawn the hologram
-            Hologram hologram = FancyHologramsPlugin.get().getHologramManager().create(data);
+            de.oliver.fancyholograms.api.HologramManager fhManager = FancyHologramsPlugin.get().getHologramManager();
+            Hologram hologram = fhManager.create(data);
             if (hologram != null) {
                 hologram.createHologram();
-                // Use forceShowHologram to actually send packets and make it visible
+                // Register with FancyHolograms so it manages visibility and updates
+                fhManager.addHologram(hologram);
+                // Force-show to all online players immediately
                 Bukkit.getOnlinePlayers().forEach(hologram::forceShowHologram);
                 activeHolograms.put(petEntity.getUniqueId(), hologram);
                 return true;
@@ -139,7 +142,8 @@ public class HologramManager implements Listener {
                 textData.getText().set(1, healthLine);
             }
 
-            hologram.updateHologram();
+            hologram.forceUpdate();
+            hologram.refreshForViewersInWorld();
 
         } catch (Exception e) {
             plugin.getLogger().log(Level.WARNING, "Failed to update hologram for pet " + petEntityUuid, e);
@@ -166,7 +170,8 @@ public class HologramManager implements Listener {
             if (hologram.getData() instanceof TextHologramData textData && !textData.getText().isEmpty()) {
                 // Update the first line (pet name)
                 textData.getText().set(0, "<aqua><bold>" + newName);
-                hologram.updateHologram();
+                hologram.forceUpdate();
+                hologram.refreshForViewersInWorld();
             }
         } catch (Exception e) {
             plugin.getLogger().log(Level.WARNING, "Failed to update hologram text for pet " + petEntity.getUniqueId(), e);
