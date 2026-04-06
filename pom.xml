@@ -167,23 +167,74 @@
                         </goals>
                         <configuration>
                             <createDependencyReducedPom>false</createDependencyReducedPom>
+                            <!-- Minimize JAR by removing unused classes from shaded dependencies -->
+                            <minimizeJar>true</minimizeJar>
                             <relocations>
                                 <!-- Do NOT relocate org.sqlite - native libraries won't load after relocation -->
                                 <relocation>
                                     <pattern>com.mysql</pattern>
                                     <shadedPattern>fr.wpets.libs.mysql</shadedPattern>
                                 </relocation>
+                                <!-- Relocate Google Protobuf to avoid conflicts with other plugins -->
+                                <relocation>
+                                    <pattern>com.google.protobuf</pattern>
+                                    <shadedPattern>fr.wpets.libs.protobuf</shadedPattern>
+                                </relocation>
                             </relocations>
                             <filters>
                                 <filter>
                                     <artifact>*:*</artifact>
                                     <excludes>
+                                        <!-- Exclude signature files -->
                                         <exclude>META-INF/*.SF</exclude>
                                         <exclude>META-INF/*.DSA</exclude>
                                         <exclude>META-INF/*.RSA</exclude>
+                                        <!-- Exclude unnecessary metadata -->
+                                        <exclude>META-INF/MANIFEST.MF</exclude>
+                                        <exclude>META-INF/LICENSE</exclude>
+                                        <exclude>META-INF/LICENSE.txt</exclude>
+                                        <exclude>META-INF/NOTICE</exclude>
+                                        <exclude>META-INF/NOTICE.txt</exclude>
+                                        <exclude>META-INF/DEPENDENCIES</exclude>
+                                        <!-- Exclude Maven metadata -->
+                                        <exclude>META-INF/maven/**</exclude>
+                                        <!-- Exclude module-info for Java 9+ modules to avoid conflicts -->
+                                        <exclude>module-info.class</exclude>
                                     </excludes>
                                 </filter>
+                                <!-- Keep all classes from SQLite to ensure native library loading works -->
+                                <filter>
+                                    <artifact>org.xerial:sqlite-jdbc</artifact>
+                                    <includes>
+                                        <include>**</include>
+                                    </includes>
+                                </filter>
+                                <!-- Keep necessary MySQL classes for JDBC driver -->
+                                <filter>
+                                    <artifact>com.mysql:mysql-connector-j</artifact>
+                                    <includes>
+                                        <include>**</include>
+                                    </includes>
+                                </filter>
                             </filters>
+                            <transformers>
+                                <!-- Create proper manifest for plugin JAR -->
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                    <manifestEntries>
+                                        <Implementation-Title>${project.name}</Implementation-Title>
+                                        <Implementation-Version>${project.version}</Implementation-Version>
+                                        <Built-By>Maven</Built-By>
+                                    </manifestEntries>
+                                </transformer>
+                                <!-- Merge service files from dependencies -->
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
+                                <!-- Append LICENSE files from all dependencies -->
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ApacheLicenseResourceTransformer"/>
+                                <!-- Merge NOTICE files -->
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ApacheNoticeResourceTransformer">
+                                    <addHeader>false</addHeader>
+                                </transformer>
+                            </transformers>
                         </configuration>
                     </execution>
                 </executions>
