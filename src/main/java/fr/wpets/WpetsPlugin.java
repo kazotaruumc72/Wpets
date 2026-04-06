@@ -131,6 +131,7 @@ public class WpetsPlugin extends JavaPlugin {
 
         // Background tasks
         petManager.startFollowTask();
+        petManager.startMountedMovementTask();
         if (hologramManager != null) {
             hologramManager.startUpdateTask();
         }

@@ -222,16 +222,21 @@ public class PetContextMenuGUI implements Listener {
 
         switch (slot) {
             case SLOT_MOUNT -> {
-                // Toggle mount
+                // Toggle mount – close inventory first to avoid conflicts
                 boolean isMounted = plugin.getPetManager().isMounted(uuid);
+                player.closeInventory();
                 if (isMounted) {
                     plugin.getPetManager().dismount(player);
                     player.sendMessage(MessageUtil.get("pet-dismounted"));
                 } else {
-                    plugin.getPetManager().mount(player);
-                    player.sendMessage(MessageUtil.get("pet-mounted"));
+                    // Mount with a 1-tick delay so the inventory is fully closed
+                    Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                        if (plugin.getPetManager().hasActivePet(uuid)) {
+                            plugin.getPetManager().mount(player);
+                            player.sendMessage(MessageUtil.get("pet-mounted"));
+                        }
+                    }, 1L);
                 }
-                player.closeInventory();
             }
             case SLOT_FOLLOW -> {
                 // Toggle follow
