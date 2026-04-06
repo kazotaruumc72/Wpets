@@ -13,7 +13,7 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.vehicle.VehicleExitEvent;
 import org.bukkit.util.Vector;
-import org.spigotmc.event.entity.EntityDismountEvent;
+import org.bukkit.event.entity.EntityDismountEvent;
 
 import java.util.UUID;
 
