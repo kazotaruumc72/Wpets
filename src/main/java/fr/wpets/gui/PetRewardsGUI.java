@@ -62,7 +62,6 @@ public class PetRewardsGUI implements Listener {
             return;
         }
 
-        int slot = 0;
         List<Integer> levels = new ArrayList<>();
 
         // Parse level keys and sort them
@@ -77,13 +76,23 @@ public class PetRewardsGUI implements Listener {
 
         // Create reward items for each level
         for (int level : levels) {
-            if (slot >= SIZE) break;
-
             ConfigurationSection rewardSection = rewardsSection.getConfigurationSection(String.valueOf(level));
             if (rewardSection != null) {
                 ItemStack rewardItem = createRewardItem(player, petData, petId, level, rewardSection);
-                inv.setItem(slot, rewardItem);
-                slot++;
+
+                // Use custom slot if specified, otherwise use next available slot
+                int slot = rewardSection.getInt("slot", -1);
+                if (slot >= 0 && slot < SIZE) {
+                    inv.setItem(slot, rewardItem);
+                } else {
+                    // Find next available slot
+                    for (int i = 0; i < SIZE; i++) {
+                        if (inv.getItem(i) == null) {
+                            inv.setItem(i, rewardItem);
+                            break;
+                        }
+                    }
+                }
             }
         }
 
@@ -98,6 +107,122 @@ public class PetRewardsGUI implements Listener {
         boolean claimed = isRewardClaimed(player.getUniqueId(), petId, rewardLevel);
         boolean canClaim = petData.getLevel() >= rewardLevel && !claimed;
 
+        // Determine which item configuration to use
+        String stateKey;
+        if (claimed) {
+            stateKey = "claimed";
+        } else if (canClaim) {
+            stateKey = "claimable";
+        } else {
+            stateKey = "locked";
+        }
+
+        // Get item configuration section
+        ConfigurationSection itemSection = rewardSection.getConfigurationSection("item." + stateKey);
+        if (itemSection == null) {
+            // Fallback to hardcoded defaults if configuration is missing
+            return createLegacyRewardItem(player, petData, rewardLevel, rewardSection, claimed, canClaim);
+        }
+
+        // Get material
+        String materialName = itemSection.getString("material", "GRAY_DYE");
+        Material material;
+        try {
+            material = Material.valueOf(materialName.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            material = Material.GRAY_DYE;
+        }
+
+        ItemStack item = new ItemStack(material);
+        ItemMeta meta = item.getItemMeta();
+        if (meta == null) return item;
+
+        // Set custom model data if specified
+        int customModelData = itemSection.getInt("custom-model-data", 0);
+        if (customModelData > 0) {
+            meta.setCustomModelData(customModelData);
+        }
+
+        // Set display name with placeholders
+        String displayName = itemSection.getString("name", "&7Level " + rewardLevel + " Reward");
+        displayName = replacePlaceholders(displayName, player, petData, rewardLevel);
+        meta.setDisplayName(MessageUtil.colorize(displayName));
+
+        // Build lore with placeholders
+        List<String> loreTemplate = itemSection.getStringList("lore");
+        List<String> lore = new ArrayList<>();
+
+        for (String line : loreTemplate) {
+            if (line.equals("{rewards}")) {
+                // Insert rewards details
+                lore.addAll(buildRewardsLore(rewardSection));
+            } else {
+                String processedLine = replacePlaceholders(line, player, petData, rewardLevel);
+                lore.add(MessageUtil.colorize(processedLine));
+            }
+        }
+
+        // Add hidden tag for level identification
+        lore.add(ChatColor.BLACK + "reward_level:" + rewardLevel);
+
+        meta.setLore(lore);
+        item.setItemMeta(meta);
+
+        return item;
+    }
+
+    /**
+     * Replaces placeholders in text with actual values.
+     */
+    private String replacePlaceholders(String text, Player player, PetData petData, int rewardLevel) {
+        return text
+                .replace("{level}", String.valueOf(rewardLevel))
+                .replace("{pet_level}", String.valueOf(petData.getLevel()))
+                .replace("{player}", player.getName());
+    }
+
+    /**
+     * Builds the rewards lore section.
+     */
+    private List<String> buildRewardsLore(ConfigurationSection rewardSection) {
+        List<String> lore = new ArrayList<>();
+
+        // Show player commands
+        List<String> playerCommands = rewardSection.getStringList("player-commands");
+        if (!playerCommands.isEmpty()) {
+            lore.add(MessageUtil.colorize("&7Player Commands:"));
+            for (String cmd : playerCommands) {
+                lore.add(MessageUtil.colorize("  &8• &f" + cmd));
+            }
+        }
+
+        // Show console commands
+        List<String> consoleCommands = rewardSection.getStringList("console-commands");
+        if (!consoleCommands.isEmpty()) {
+            lore.add(MessageUtil.colorize("&7Console Commands:"));
+            for (String cmd : consoleCommands) {
+                lore.add(MessageUtil.colorize("  &8• &f" + cmd));
+            }
+        }
+
+        // Show Nexo items
+        List<String> nexoItems = rewardSection.getStringList("nexo-items");
+        if (!nexoItems.isEmpty()) {
+            lore.add(MessageUtil.colorize("&7Nexo Items:"));
+            for (String itemSpec : nexoItems) {
+                lore.add(MessageUtil.colorize("  &8• &f" + itemSpec));
+            }
+        }
+
+        return lore;
+    }
+
+    /**
+     * Creates a legacy reward item for backward compatibility.
+     * Used when item configuration is not present in config.
+     */
+    private ItemStack createLegacyRewardItem(Player player, PetData petData, int rewardLevel,
+                                             ConfigurationSection rewardSection, boolean claimed, boolean canClaim) {
         // Determine item appearance based on status
         Material material;
         if (claimed) {
@@ -130,34 +255,7 @@ public class PetRewardsGUI implements Listener {
         lore.add(MessageUtil.colorize("&7Required level: &e" + rewardLevel));
         lore.add("");
         lore.add(MessageUtil.colorize("&6Rewards:"));
-
-        // Show player commands
-        List<String> playerCommands = rewardSection.getStringList("player-commands");
-        if (!playerCommands.isEmpty()) {
-            lore.add(MessageUtil.colorize("&7Player Commands:"));
-            for (String cmd : playerCommands) {
-                lore.add(MessageUtil.colorize("  &8• &f" + cmd));
-            }
-        }
-
-        // Show console commands
-        List<String> consoleCommands = rewardSection.getStringList("console-commands");
-        if (!consoleCommands.isEmpty()) {
-            lore.add(MessageUtil.colorize("&7Console Commands:"));
-            for (String cmd : consoleCommands) {
-                lore.add(MessageUtil.colorize("  &8• &f" + cmd));
-            }
-        }
-
-        // Show Nexo items
-        List<String> nexoItems = rewardSection.getStringList("nexo-items");
-        if (!nexoItems.isEmpty()) {
-            lore.add(MessageUtil.colorize("&7Nexo Items:"));
-            for (String itemSpec : nexoItems) {
-                lore.add(MessageUtil.colorize("  &8• &f" + itemSpec));
-            }
-        }
-
+        lore.addAll(buildRewardsLore(rewardSection));
         lore.add("");
         if (claimed) {
             lore.add(MessageUtil.colorize("&a✔ Already claimed!"));
