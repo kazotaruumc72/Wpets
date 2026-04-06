@@ -3,6 +3,13 @@
 # ==========================================
 # Each entry defines one pet type.
 # 'mythicmob-id' is the internal name used in MythicMobs mobs.yml
+# 'flying' defines whether the pet is a flying mount (true) or ground mount (false)
+#   - Flying mounts (e.g., ghasts, phantoms): Set flying: true
+#   - Ground mounts (e.g., wolves, horses): Set flying: false
+#   When mounted on a flying pet, players can:
+#     - Look in the direction they want to fly
+#     - Hold Shift to descend
+#     - Look up to ascend
 
 pets:
   wolf_guardian:
