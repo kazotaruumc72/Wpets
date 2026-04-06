@@ -79,6 +79,9 @@ public class PetContextMenuGUI implements Listener {
         if (meta != null) {
             meta.setDisplayName(MessageUtil.colorize("&6&lMount Pet"));
             List<String> lore = new ArrayList<>();
+            lore.add(MessageUtil.colorize("&7Ride on your pet's back and"));
+            lore.add(MessageUtil.colorize("&7travel together as one!"));
+            lore.add("");
             if (isMounted) {
                 lore.add(MessageUtil.colorize("&7Status: &aMounted"));
                 lore.add(MessageUtil.colorize("&7Click to dismount"));
@@ -104,6 +107,9 @@ public class PetContextMenuGUI implements Listener {
         if (meta != null) {
             meta.setDisplayName(MessageUtil.colorize("&6&lFollow Mode"));
             List<String> lore = new ArrayList<>();
+            lore.add(MessageUtil.colorize("&7Toggle whether your pet follows"));
+            lore.add(MessageUtil.colorize("&7you around or stays in place."));
+            lore.add("");
             if (isFollowing) {
                 lore.add(MessageUtil.colorize("&7Status: &aFollowing"));
                 lore.add(MessageUtil.colorize("&7Click to disable following"));
@@ -126,6 +132,9 @@ public class PetContextMenuGUI implements Listener {
         if (meta != null) {
             meta.setDisplayName(MessageUtil.colorize("&6&lRename Pet"));
             List<String> lore = new ArrayList<>();
+            lore.add(MessageUtil.colorize("&7Give your pet a unique name"));
+            lore.add(MessageUtil.colorize("&7to make it truly yours!"));
+            lore.add("");
             lore.add(MessageUtil.colorize("&7Click to rename your pet"));
             lore.add(MessageUtil.colorize("&7Type the new name in chat"));
             meta.setLore(lore);
@@ -145,6 +154,9 @@ public class PetContextMenuGUI implements Listener {
         if (meta != null) {
             meta.setDisplayName(MessageUtil.colorize("&6&lPet Information"));
             List<String> lore = new ArrayList<>();
+            lore.add(MessageUtil.colorize("&7View your pet's stats and"));
+            lore.add(MessageUtil.colorize("&7progression details."));
+            lore.add("");
             lore.add(MessageUtil.colorize("&7Name: &e" + displayName));
             lore.add(MessageUtil.colorize("&7Level: &e" + petData.getLevel()));
             lore.add(MessageUtil.colorize("&7XP: &e" + petData.getExperience()));
