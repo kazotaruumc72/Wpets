@@ -46,7 +46,7 @@ public class PetContextMenuGUI implements Listener {
         UUID uuid = player.getUniqueId();
 
         if (!plugin.getPetManager().hasActivePet(uuid)) {
-            player.sendMessage(MessageUtil.getMessage("pet-not-active"));
+            player.sendMessage(MessageUtil.get("pet-not-active"));
             return;
         }
 
@@ -186,10 +186,10 @@ public class PetContextMenuGUI implements Listener {
                 boolean isMounted = plugin.getPetManager().isMounted(uuid);
                 if (isMounted) {
                     plugin.getPetManager().dismount(player);
-                    player.sendMessage(MessageUtil.getMessage("pet-dismounted"));
+                    player.sendMessage(MessageUtil.get("pet-dismounted"));
                 } else {
                     plugin.getPetManager().mount(player);
-                    player.sendMessage(MessageUtil.getMessage("pet-mounted"));
+                    player.sendMessage(MessageUtil.get("pet-mounted"));
                 }
                 player.closeInventory();
             }
@@ -198,10 +198,10 @@ public class PetContextMenuGUI implements Listener {
                 boolean isFollowing = plugin.getPetManager().isFollowing(uuid);
                 if (isFollowing) {
                     plugin.getPetManager().setFollowing(uuid, false);
-                    player.sendMessage(MessageUtil.getMessage("pet-follow-disabled"));
+                    player.sendMessage(MessageUtil.get("pet-follow-disabled"));
                 } else {
                     plugin.getPetManager().setFollowing(uuid, true);
-                    player.sendMessage(MessageUtil.getMessage("pet-follow-enabled"));
+                    player.sendMessage(MessageUtil.get("pet-follow-enabled"));
                 }
                 player.closeInventory();
             }
@@ -209,7 +209,7 @@ public class PetContextMenuGUI implements Listener {
                 // Start rename process
                 plugin.getPetManager().startRenameProcess(player);
                 player.closeInventory();
-                player.sendMessage(MessageUtil.getMessage("pet-rename-prompt"));
+                player.sendMessage(MessageUtil.get("pet-rename-prompt"));
             }
             case SLOT_INFO -> {
                 // Just close the menu, info is display-only

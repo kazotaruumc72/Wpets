@@ -161,7 +161,7 @@ public class PlayerListener implements Listener {
             // Allow "cancel" to abort the rename
             if (newName.equalsIgnoreCase("cancel")) {
                 plugin.getPetManager().cancelRename(uuid);
-                player.sendMessage(MessageUtil.getMessage("pet-rename-cancelled"));
+                player.sendMessage(MessageUtil.get("pet-rename-cancelled"));
                 return;
             }
 
@@ -174,7 +174,7 @@ public class PlayerListener implements Listener {
             String finalName = newName;
             plugin.getServer().getScheduler().runTask(plugin, () -> {
                 plugin.getPetManager().completeRename(player, finalName);
-                player.sendMessage(MessageUtil.getMessage("pet-renamed")
+                player.sendMessage(MessageUtil.get("pet-renamed")
                         .replace("{name}", finalName));
             });
         }

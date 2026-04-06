@@ -70,19 +70,17 @@ public class HologramManager implements Listener {
 
             // Create hologram data
             String hologramName = "wpets_pet_" + petEntity.getUniqueId().toString();
-            TextHologramData.Builder builder = new TextHologramData.Builder(hologramName, hologramLoc)
-                    .setPersistent(false)
-                    .setTextUpdateInterval(20); // Update every second
+            TextHologramData data = new TextHologramData(hologramName, hologramLoc);
+            data.setPersistent(false);
+            data.setTextUpdateInterval(20); // Update every second
 
             // Add lines
             if (!petName.isEmpty()) {
-                builder.addLine("<aqua><bold>" + petName);
+                data.addLine("<aqua><bold>" + petName);
             }
             if (!healthLine.isEmpty()) {
-                builder.addLine(healthLine);
+                data.addLine(healthLine);
             }
-
-            TextHologramData data = builder.build();
 
             // Create and spawn the hologram
             Hologram hologram = FancyHologramsPlugin.get().getHologramManager().create(data);
@@ -127,14 +125,14 @@ public class HologramManager implements Listener {
             hologram.getData().setLocation(newLoc);
 
             // Update health line if it's a LivingEntity
-            if (petEntity instanceof LivingEntity living && hologram.getData().getText().size() > 1) {
+            if (petEntity instanceof LivingEntity living && hologram.getData() instanceof TextHologramData textData && textData.getLines().size() > 1) {
                 double health = living.getHealth();
                 double maxHealth = living.getAttribute(org.bukkit.attribute.Attribute.MAX_HEALTH) != null
                         ? living.getAttribute(org.bukkit.attribute.Attribute.MAX_HEALTH).getValue()
                         : 20.0;
                 String healthLine = String.format("<red>❤ %.1f / %.1f", health, maxHealth);
 
-                hologram.getData().getText().set(1, healthLine);
+                textData.getLines().set(1, healthLine);
             }
 
             hologram.updateHologram();
@@ -154,7 +152,7 @@ public class HologramManager implements Listener {
         if (hologram != null) {
             try {
                 hologram.deleteHologram();
-                FancyHologramsPlugin.get().getHologramManager().remove(hologram.getData().getName());
+                FancyHologramsPlugin.get().getHologramManager().removeHologram(hologram);
             } catch (Exception e) {
                 plugin.getLogger().log(Level.WARNING, "Failed to remove hologram for pet " + petEntityUuid, e);
             }
