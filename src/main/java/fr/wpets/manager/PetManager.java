@@ -473,11 +473,6 @@ public class PetManager {
      */
     public void cancelRename(UUID playerUuid) {
         awaitingRename.remove(playerUuid);
-
-        // Remove hologram when pet dies
-        if (mobUuid != null) {
-            plugin.getHologramManager().removeHologram(mobUuid);
-        }
     }
 
     // ── Helpers ──────────────────────────────────────────────────────────────
