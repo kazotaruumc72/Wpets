@@ -58,6 +58,7 @@ public class PetManager {
 
     /**
      * Starts the follow-loop that keeps pets close to their owners.
+     * Also handles flying pet movement when mounted.
      */
     public void startFollowTask() {
         double followDist = plugin.getConfig().getDouble("pet-follow-distance", 4.0);
@@ -68,15 +69,29 @@ public class PetManager {
                     Player player = Bukkit.getPlayer(entry.getKey());
                     if (player == null || !player.isOnline()) continue;
 
-                    // Check if following is disabled
-                    if (!isFollowing(entry.getKey())) continue;
-
                     Entity petEntity = Bukkit.getEntity(entry.getValue());
                     if (petEntity == null || !petEntity.isValid()) {
                         activePets.remove(entry.getKey());
                         activePetTypes.remove(entry.getKey());
                         continue;
                     }
+
+                    // Handle flying pet movement when player is mounted
+                    if (isMounted(entry.getKey()) && petEntity.getPassengers().contains(player)) {
+                        String petId = activePetTypes.get(entry.getKey());
+                        if (petId != null) {
+                            FileConfiguration petsCfg = plugin.getPetsConfig();
+                            boolean isFlying = petsCfg.getBoolean("pets." + petId + ".flying", false);
+
+                            if (isFlying) {
+                                handleFlyingPetMovement(player, petEntity);
+                                continue; // Skip follow logic when mounted
+                            }
+                        }
+                    }
+
+                    // Check if following is disabled
+                    if (!isFollowing(entry.getKey())) continue;
 
                     // Teleport the pet back if too far away or in a different world
                     if (!petEntity.getWorld().equals(player.getWorld())
@@ -406,6 +421,7 @@ public class PetManager {
 
     /**
      * Mounts the player on their active pet.
+     * Flying pets will have gravity disabled to allow flying.
      */
     public void mount(Player player) {
         UUID uuid = player.getUniqueId();
@@ -415,12 +431,28 @@ public class PetManager {
         Entity petEntity = Bukkit.getEntity(petEntityUuid);
         if (petEntity == null) return;
 
+        // Check if this pet is a flying mount
+        String petId = activePetTypes.get(uuid);
+        boolean isFlying = false;
+        if (petId != null) {
+            FileConfiguration petsCfg = plugin.getPetsConfig();
+            isFlying = petsCfg.getBoolean("pets." + petId + ".flying", false);
+        }
+
+        // For flying pets, disable gravity to allow flight
+        if (isFlying) {
+            petEntity.setGravity(false);
+        } else {
+            petEntity.setGravity(true);
+        }
+
         petEntity.addPassenger(player);
         mountedPlayers.put(uuid, true);
     }
 
     /**
      * Dismounts the player from their active pet.
+     * Restores gravity for flying pets.
      */
     public void dismount(Player player) {
         UUID uuid = player.getUniqueId();
@@ -430,6 +462,9 @@ public class PetManager {
         Entity petEntity = Bukkit.getEntity(petEntityUuid);
         if (petEntity != null && petEntity.getPassengers().contains(player)) {
             petEntity.removePassenger(player);
+
+            // Restore gravity for all pets after dismounting
+            petEntity.setGravity(true);
         }
         mountedPlayers.put(uuid, false);
     }
@@ -508,6 +543,50 @@ public class PetManager {
     }
 
     // ── Helpers ──────────────────────────────────────────────────────────────
+
+    /**
+     * Handles movement for flying pets when a player is mounted.
+     * Allows the player to control the flying pet's movement including vertical movement.
+     */
+    private void handleFlyingPetMovement(Player player, Entity petEntity) {
+        if (!(petEntity instanceof LivingEntity)) return;
+
+        // Get player's look direction
+        org.bukkit.util.Vector direction = player.getLocation().getDirection().normalize();
+
+        // Base flying speed - use the pet's movement speed attribute if available
+        double flySpeed = 0.4;
+        if (petEntity instanceof LivingEntity living) {
+            var speedAttr = living.getAttribute(Attribute.MOVEMENT_SPEED);
+            if (speedAttr != null) {
+                flySpeed = Math.min(1.0, speedAttr.getValue() * 1.5);
+            }
+        }
+
+        // Calculate movement based on player input
+        org.bukkit.util.Vector velocity = new org.bukkit.util.Vector(0, 0, 0);
+
+        // Get player's movement direction (WASD keys)
+        float forward = player.getLocation().getPitch() < -30 ? 1.0f :
+                       player.getLocation().getPitch() > 30 ? -0.3f : 0.7f;
+
+        // Move in the direction the player is looking
+        velocity.setX(direction.getX() * flySpeed * forward);
+        velocity.setZ(direction.getZ() * flySpeed * forward);
+
+        // Vertical movement
+        if (player.isSneaking()) {
+            // Descend when sneaking (shift key)
+            velocity.setY(-0.4);
+        } else {
+            // Ascend based on look direction (looking up = go up)
+            double verticalComponent = -direction.getY();
+            velocity.setY(Math.max(-0.5, Math.min(0.5, verticalComponent * flySpeed)));
+        }
+
+        // Apply velocity to the pet entity
+        petEntity.setVelocity(velocity);
+    }
 
     private boolean isMythicMobsAvailable() {
         return plugin.getServer().getPluginManager().getPlugin("MythicMobs") != null;
