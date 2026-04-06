@@ -152,12 +152,6 @@ public class PetContextMenuGUI implements Listener {
             lore.add("");
             lore.add(MessageUtil.colorize("&7Pet ID: &8" + petId));
 
-            // Add custom model data if available
-            int customModelData = plugin.getPetsConfig().getInt("pets." + petId + ".menu-icon.custom-model-data", -1);
-            if (customModelData > 0) {
-                lore.add(MessageUtil.colorize("&7Custom Model Data: &8" + customModelData));
-            }
-
             meta.setLore(lore);
             item.setItemMeta(meta);
         }
