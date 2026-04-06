@@ -125,14 +125,14 @@ public class HologramManager implements Listener {
             hologram.getData().setLocation(newLoc);
 
             // Update health line if it's a LivingEntity
-            if (petEntity instanceof LivingEntity living && hologram.getData() instanceof TextHologramData textData && textData.getLines().size() > 1) {
+            if (petEntity instanceof LivingEntity living && hologram.getData() instanceof TextHologramData textData && textData.getText().size() > 1) {
                 double health = living.getHealth();
                 double maxHealth = living.getAttribute(org.bukkit.attribute.Attribute.MAX_HEALTH) != null
                         ? living.getAttribute(org.bukkit.attribute.Attribute.MAX_HEALTH).getValue()
                         : 20.0;
                 String healthLine = String.format("<red>❤ %.1f / %.1f", health, maxHealth);
 
-                textData.getLines().set(1, healthLine);
+                textData.getText().set(1, healthLine);
             }
 
             hologram.updateHologram();
