@@ -10,6 +10,8 @@ ZipException opening "ChatColorHandler-v2.5.3.jar": zip END header not found
 
 This indicates a **corrupted JAR file** in your local Maven repository.
 
+> **Good news:** The build now automatically removes any cached `me/dave/ChatColorHandler` folder during the `validate` phase (before compilation). If the error still appears, your local cache may be heavily corrupted—follow the steps below to force a clean re-download.
+
 ### Root Cause
 Maven downloaded a dependency JAR file, but the download was interrupted or corrupted. Maven stores these files in `~/.m2/repository` (Linux/Mac) or `C:\Users\<username>\.m2\repository` (Windows).
 
