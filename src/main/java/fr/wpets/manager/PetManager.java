@@ -44,6 +44,9 @@ public class PetManager {
     /** Maps player UUID → mounted state */
     private final Map<UUID, Boolean> mountedPlayers = new HashMap<>();
 
+    /** Tracks players currently in a voluntary (plugin-initiated) dismount */
+    private final Set<UUID> voluntaryDismount = new HashSet<>();
+
     /** Maps player UUID → follow state (true = following, false = stay) */
     private final Map<UUID, Boolean> followingState = new HashMap<>();
 
@@ -76,18 +79,10 @@ public class PetManager {
                         continue;
                     }
 
-                    // Handle flying pet movement when player is mounted
+                    // Skip follow logic for mounted players – movement is handled
+                    // by the dedicated mounted-movement task (startMountedMovementTask)
                     if (isMounted(entry.getKey()) && petEntity.getPassengers().contains(player)) {
-                        String petId = activePetTypes.get(entry.getKey());
-                        if (petId != null) {
-                            FileConfiguration petsCfg = plugin.getPetsConfig();
-                            boolean isFlying = petsCfg.getBoolean("pets." + petId + ".flying", false);
-
-                            if (isFlying) {
-                                handleFlyingPetMovement(player, petEntity);
-                                continue; // Skip follow logic when mounted
-                            }
-                        }
+                        continue;
                     }
 
                     // Check if following is disabled
@@ -101,6 +96,50 @@ public class PetManager {
                 }
             }
         }.runTaskTimer(plugin, 20L, 20L);
+    }
+
+    /**
+     * Starts a fast tick task (every tick) that handles movement for mounted pets.
+     * Separated from the follow-loop so that mounted movement is smooth (50 ms)
+     * while the follow-loop can remain at a slower cadence (1 s).
+     */
+    public void startMountedMovementTask() {
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                for (Map.Entry<UUID, UUID> entry : new HashMap<>(activePets).entrySet()) {
+                    if (!isMounted(entry.getKey())) continue;
+
+                    Player player = Bukkit.getPlayer(entry.getKey());
+                    if (player == null || !player.isOnline()) continue;
+
+                    Entity petEntity = Bukkit.getEntity(entry.getValue());
+                    if (petEntity == null || !petEntity.isValid()) continue;
+
+                    if (!petEntity.getPassengers().contains(player)) {
+                        // Player is not actually on the pet – fix desync
+                        mountedPlayers.put(entry.getKey(), false);
+                        if (petEntity instanceof org.bukkit.entity.Mob mob) {
+                            mob.setAI(true);
+                        }
+                        petEntity.setGravity(true);
+                        continue;
+                    }
+
+                    String petId = activePetTypes.get(entry.getKey());
+                    if (petId == null) continue;
+
+                    boolean isFlying = plugin.getPetsConfig()
+                            .getBoolean("pets." + petId + ".flying", false);
+
+                    if (isFlying) {
+                        handleFlyingPetMovement(player, petEntity);
+                    } else {
+                        handleGroundPetMovement(player, petEntity);
+                    }
+                }
+            }
+        }.runTaskTimer(plugin, 1L, 1L);
     }
 
     /**
@@ -218,6 +257,7 @@ public class PetManager {
         activePetTypes.remove(uuid);
         mountedPlayers.remove(uuid);
         followingState.remove(uuid);
+        voluntaryDismount.remove(uuid);
 
         if (mobUuid != null) {
             // Remove hologram first
@@ -228,6 +268,10 @@ public class PetManager {
 
             Entity e = Bukkit.getEntity(mobUuid);
             if (e != null) {
+                // Restore AI before dismissal so entity is in a clean state
+                if (e instanceof org.bukkit.entity.Mob mob) {
+                    mob.setAI(true);
+                }
                 // Dismount player if mounted
                 if (e.getPassengers().contains(player)) {
                     e.removePassenger(player);
@@ -408,6 +452,7 @@ public class PetManager {
         activePetTypes.remove(ownerUuid);
         mountedPlayers.remove(ownerUuid);
         followingState.remove(ownerUuid);
+        voluntaryDismount.remove(ownerUuid);
     }
 
     // ── Mounting & Following ─────────────────────────────────────────────────
@@ -420,8 +465,38 @@ public class PetManager {
     }
 
     /**
+     * Returns {@code true} if the given player is in the middle of a voluntary
+     * (plugin-initiated) dismount, so the {@code EntityDismountEvent} handler
+     * can distinguish it from an involuntary Shift-key dismount.
+     */
+    public boolean isVoluntaryDismount(UUID playerUuid) {
+        return voluntaryDismount.contains(playerUuid);
+    }
+
+    /**
+     * Clears the voluntary-dismount flag after the event handler has processed it.
+     */
+    public void clearVoluntaryDismount(UUID playerUuid) {
+        voluntaryDismount.remove(playerUuid);
+    }
+
+    /**
+     * Called by the {@code EntityDismountEvent} handler when the player is
+     * dismounted externally (e.g. the pet entity dies or becomes invalid).
+     * Restores AI and gravity and updates the mounted-state tracking.
+     */
+    public void onExternalDismount(UUID playerUuid, Entity petEntity) {
+        mountedPlayers.put(playerUuid, false);
+        if (petEntity instanceof org.bukkit.entity.Mob mob) {
+            mob.setAI(true);
+        }
+        petEntity.setGravity(true);
+    }
+
+    /**
      * Mounts the player on their active pet.
      * Flying pets will have gravity disabled to allow flying.
+     * Mob AI is disabled while mounted so it does not fight player-controlled movement.
      */
     public void mount(Player player) {
         UUID uuid = player.getUniqueId();
@@ -446,13 +521,18 @@ public class PetManager {
             petEntity.setGravity(true);
         }
 
+        // Disable AI so the mob does not fight player-controlled movement
+        if (petEntity instanceof org.bukkit.entity.Mob mob) {
+            mob.setAI(false);
+        }
+
         petEntity.addPassenger(player);
         mountedPlayers.put(uuid, true);
     }
 
     /**
      * Dismounts the player from their active pet.
-     * Restores gravity for flying pets.
+     * Restores gravity and AI after dismounting.
      */
     public void dismount(Player player) {
         UUID uuid = player.getUniqueId();
@@ -460,11 +540,22 @@ public class PetManager {
         if (petEntityUuid == null) return;
 
         Entity petEntity = Bukkit.getEntity(petEntityUuid);
-        if (petEntity != null && petEntity.getPassengers().contains(player)) {
-            petEntity.removePassenger(player);
+        if (petEntity != null) {
+            // Mark as voluntary so the EntityDismountEvent handler allows it
+            voluntaryDismount.add(uuid);
 
-            // Restore gravity for all pets after dismounting
+            if (petEntity.getPassengers().contains(player)) {
+                petEntity.removePassenger(player);
+            }
+
+            // Restore AI and gravity
+            if (petEntity instanceof org.bukkit.entity.Mob mob) {
+                mob.setAI(true);
+            }
             petEntity.setGravity(true);
+
+            // Clean up flag in case the event handler did not fire
+            voluntaryDismount.remove(uuid);
         }
         mountedPlayers.put(uuid, false);
     }
@@ -586,6 +677,49 @@ public class PetManager {
 
         // Apply velocity to the pet entity
         petEntity.setVelocity(velocity);
+    }
+
+    /**
+     * Handles movement for ground pets when a player is mounted.
+     * The pet moves forward in the direction the player is looking (horizontal).
+     * Includes automatic jump-over-block behaviour.
+     */
+    private void handleGroundPetMovement(Player player, Entity petEntity) {
+        if (!(petEntity instanceof LivingEntity living)) return;
+
+        // Get player's horizontal look direction
+        org.bukkit.util.Vector direction = player.getLocation().getDirection();
+        direction.setY(0);
+        if (direction.lengthSquared() < 0.001) return; // Looking straight up/down – stand still
+        direction.normalize();
+
+        // Pet speed attribute
+        double speed = 0.3;
+        var speedAttr = living.getAttribute(Attribute.MOVEMENT_SPEED);
+        if (speedAttr != null) {
+            speed = speedAttr.getValue();
+        }
+
+        // Scale to a usable velocity magnitude
+        double moveSpeed = speed * 2.5;
+
+        org.bukkit.util.Vector velocity = direction.multiply(moveSpeed);
+
+        // Preserve current Y velocity so gravity keeps working
+        velocity.setY(petEntity.getVelocity().getY());
+
+        // Auto-jump: step up when a solid block is directly ahead at foot level
+        if (petEntity.isOnGround()) {
+            Location ahead = petEntity.getLocation().clone().add(direction.clone().multiply(0.6));
+            if (ahead.getBlock().getType().isSolid()) {
+                velocity.setY(0.42); // Standard jump height
+            }
+        }
+
+        petEntity.setVelocity(velocity);
+
+        // Rotate the pet to face the direction of travel
+        living.setRotation(player.getLocation().getYaw(), 0);
     }
 
     private boolean isMythicMobsAvailable() {

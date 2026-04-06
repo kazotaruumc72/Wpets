@@ -13,6 +13,7 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.vehicle.VehicleExitEvent;
 import org.bukkit.util.Vector;
+import org.spigotmc.event.entity.EntityDismountEvent;
 
 import java.util.UUID;
 
@@ -101,7 +102,49 @@ public class EntityListener implements Listener {
     }
 
     /**
+     * Prevents players from being dismounted from their pet when pressing Shift.
+     * <p>
+     * Voluntary dismounts (triggered by the plugin itself through
+     * {@link fr.wpets.manager.PetManager#dismount}) are allowed.
+     * Dismounts caused by entity death/removal are also allowed and trigger
+     * a clean-up of the mounted state.
+     */
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    public void onEntityDismount(EntityDismountEvent event) {
+        if (!(event.getEntity() instanceof Player player)) return;
+
+        Entity dismounted = event.getDismounted();
+        UUID ownerUuid = plugin.getPetManager().getOwnerByMobUuid(dismounted.getUniqueId());
+
+        // Not a pet entity
+        if (ownerUuid == null) return;
+
+        // Only handle the pet's own owner
+        if (!player.getUniqueId().equals(ownerUuid)) return;
+
+        // Allow plugin-initiated (voluntary) dismount
+        if (plugin.getPetManager().isVoluntaryDismount(player.getUniqueId())) {
+            plugin.getPetManager().clearVoluntaryDismount(player.getUniqueId());
+            return;
+        }
+
+        // Allow dismount if the pet entity is dead or invalid (nothing to ride)
+        if (!dismounted.isValid() || (dismounted instanceof LivingEntity le && le.isDead())) {
+            plugin.getPetManager().onExternalDismount(player.getUniqueId(), dismounted);
+            return;
+        }
+
+        // Otherwise cancel the sneak/shift dismount
+        if (plugin.getPetManager().isMounted(player.getUniqueId())) {
+            event.setCancelled(true);
+        }
+    }
+
+    /**
      * Handles dismounting from flying pets to restore gravity.
+     * This event only fires for entities that implement {@code Vehicle};
+     * most MythicMobs pets do not, so the {@code EntityDismountEvent} handler
+     * above is the primary guard.
      */
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onVehicleExit(VehicleExitEvent event) {
