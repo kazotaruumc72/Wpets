@@ -23,6 +23,7 @@ import java.util.logging.Level;
  *   experience      BIGINT       NOT NULL DEFAULT 0,
  *   skill_points    INT          NOT NULL DEFAULT 0,
  *   unlocked_skills TEXT         NOT NULL DEFAULT '[]',
+ *   custom_name     VARCHAR(128) DEFAULT NULL,
  *   UNIQUE (player_uuid, pet_id)
  * )
  * </pre>
@@ -101,11 +102,15 @@ public class DatabaseManager {
                 + "experience BIGINT NOT NULL DEFAULT 0, "
                 + "skill_points INT NOT NULL DEFAULT 0, "
                 + "unlocked_skills TEXT NOT NULL DEFAULT '[]', "
+                + "custom_name VARCHAR(128) DEFAULT NULL, "
                 + "UNIQUE " + (mySQL ? "KEY uq_player_pet " : "") + "(player_uuid, pet_id)"
                 + ")";
         try (Statement stmt = connection.createStatement()) {
             stmt.execute(sql);
         }
+
+        // Add custom_name column if it doesn't exist (migration for existing databases)
+        migrateAddCustomNameColumn();
     }
 
     /**
@@ -121,6 +126,28 @@ public class DatabaseManager {
         }
     }
 
+    /**
+     * Migrates the database to add the custom_name column if it doesn't exist.
+     */
+    private void migrateAddCustomNameColumn() {
+        try {
+            // Check if custom_name column exists
+            DatabaseMetaData metaData = connection.getMetaData();
+            try (ResultSet rs = metaData.getColumns(null, null, "player_pets", "custom_name")) {
+                if (!rs.next()) {
+                    // Column doesn't exist, add it
+                    String sql = "ALTER TABLE player_pets ADD COLUMN custom_name VARCHAR(128) DEFAULT NULL";
+                    try (Statement stmt = connection.createStatement()) {
+                        stmt.execute(sql);
+                        plugin.getLogger().info("Added custom_name column to player_pets table");
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            plugin.getLogger().log(Level.WARNING, "Failed to migrate custom_name column", e);
+        }
+    }
+
     // ── CRUD ─────────────────────────────────────────────────────────────────
 
     /**
@@ -128,7 +155,7 @@ public class DatabaseManager {
      * the player has never owned this pet type.
      */
     public PetData loadPetData(UUID playerUuid, String petId) {
-        String sql = "SELECT level, experience, skill_points, unlocked_skills "
+        String sql = "SELECT level, experience, skill_points, unlocked_skills, custom_name "
                 + "FROM player_pets WHERE player_uuid = ? AND pet_id = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, playerUuid.toString());
@@ -141,7 +168,8 @@ public class DatabaseManager {
                             rs.getInt("level"),
                             rs.getLong("experience"),
                             rs.getInt("skill_points"),
-                            rs.getString("unlocked_skills")
+                            rs.getString("unlocked_skills"),
+                            rs.getString("custom_name")
                     );
                 }
             }
@@ -156,7 +184,7 @@ public class DatabaseManager {
      */
     public List<PetData> loadAllPetsForPlayer(UUID playerUuid) {
         List<PetData> pets = new ArrayList<>();
-        String sql = "SELECT pet_id, level, experience, skill_points, unlocked_skills "
+        String sql = "SELECT pet_id, level, experience, skill_points, unlocked_skills, custom_name "
                 + "FROM player_pets WHERE player_uuid = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, playerUuid.toString());
@@ -168,7 +196,8 @@ public class DatabaseManager {
                             rs.getInt("level"),
                             rs.getLong("experience"),
                             rs.getInt("skill_points"),
-                            rs.getString("unlocked_skills")
+                            rs.getString("unlocked_skills"),
+                            rs.getString("custom_name")
                     ));
                 }
             }
@@ -184,15 +213,16 @@ public class DatabaseManager {
     public void savePetData(PetData data) {
         String sql;
         if (mySQL) {
-            sql = "INSERT INTO player_pets (player_uuid, pet_id, level, experience, skill_points, unlocked_skills) "
-                    + "VALUES (?, ?, ?, ?, ?, ?) "
+            sql = "INSERT INTO player_pets (player_uuid, pet_id, level, experience, skill_points, unlocked_skills, custom_name) "
+                    + "VALUES (?, ?, ?, ?, ?, ?, ?) "
                     + "ON DUPLICATE KEY UPDATE "
                     + "level = VALUES(level), experience = VALUES(experience), "
-                    + "skill_points = VALUES(skill_points), unlocked_skills = VALUES(unlocked_skills)";
+                    + "skill_points = VALUES(skill_points), unlocked_skills = VALUES(unlocked_skills), "
+                    + "custom_name = VALUES(custom_name)";
         } else {
             sql = "INSERT OR REPLACE INTO player_pets "
-                    + "(player_uuid, pet_id, level, experience, skill_points, unlocked_skills) "
-                    + "VALUES (?, ?, ?, ?, ?, ?)";
+                    + "(player_uuid, pet_id, level, experience, skill_points, unlocked_skills, custom_name) "
+                    + "VALUES (?, ?, ?, ?, ?, ?, ?)";
         }
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -202,6 +232,7 @@ public class DatabaseManager {
             ps.setLong(4, data.getExperience());
             ps.setInt(5, data.getSkillPoints());
             ps.setString(6, data.getUnlockedSkillsJson());
+            ps.setString(7, data.getCustomName());
             ps.executeUpdate();
         } catch (SQLException e) {
             plugin.getLogger().log(Level.SEVERE, "Failed to save pet data for " + data.getPlayerUuid(), e);

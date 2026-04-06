@@ -21,6 +21,7 @@ public class PetData {
     private long experience;
     private int skillPoints;
     private List<String> unlockedSkills;
+    private String customName;
 
     // Runtime-only fields (not persisted)
     private transient boolean hasLevelTenParticles = false;
@@ -34,16 +35,18 @@ public class PetData {
         this.experience = 0;
         this.skillPoints = 0;
         this.unlockedSkills = new ArrayList<>();
+        this.customName = null;
     }
 
     public PetData(UUID playerUuid, String petId, int level, long experience,
-                   int skillPoints, String unlockedSkillsJson) {
+                   int skillPoints, String unlockedSkillsJson, String customName) {
         this.playerUuid = playerUuid;
         this.petId = petId;
         this.level = level;
         this.experience = experience;
         this.skillPoints = skillPoints;
         this.unlockedSkills = parseSkillsJson(unlockedSkillsJson);
+        this.customName = customName;
     }
 
     // ── Getters ──────────────────────────────────────────────────────────────
@@ -88,6 +91,10 @@ public class PetData {
         return inventorySlots;
     }
 
+    public String getCustomName() {
+        return customName;
+    }
+
     // ── Setters ──────────────────────────────────────────────────────────────
 
     public void setLevel(int level) {
@@ -130,6 +137,10 @@ public class PetData {
 
     public void setInventorySlots(int slots) {
         this.inventorySlots = slots;
+    }
+
+    public void setCustomName(String customName) {
+        this.customName = customName;
     }
 
     // ── Serialisation ────────────────────────────────────────────────────────

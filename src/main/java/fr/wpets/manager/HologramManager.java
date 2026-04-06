@@ -143,6 +143,33 @@ public class HologramManager implements Listener {
     }
 
     /**
+     * Updates the hologram text (pet name) for a specific pet entity.
+     *
+     * @param petEntity The pet entity
+     * @param newName   The new name to display
+     */
+    public void updateHologramText(Entity petEntity, String newName) {
+        if (!isFancyHologramsAvailable()) {
+            return;
+        }
+
+        Hologram hologram = activeHolograms.get(petEntity.getUniqueId());
+        if (hologram == null) {
+            return;
+        }
+
+        try {
+            if (hologram.getData() instanceof TextHologramData textData && !textData.getText().isEmpty()) {
+                // Update the first line (pet name)
+                textData.getText().set(0, "<aqua><bold>" + newName);
+                hologram.updateHologram();
+            }
+        } catch (Exception e) {
+            plugin.getLogger().log(Level.WARNING, "Failed to update hologram text for pet " + petEntity.getUniqueId(), e);
+        }
+    }
+
+    /**
      * Removes the hologram for a specific pet entity.
      *
      * @param petEntityUuid The pet entity UUID
@@ -249,8 +276,15 @@ public class HologramManager implements Listener {
                 if (petEntity != null && petEntity.isValid()) {
                     String petTypeId = plugin.getPetManager().getActivePetTypeId(playerUuid);
                     if (petTypeId != null) {
-                        String displayName = plugin.getPetsConfig()
-                                .getString("pets." + petTypeId + ".display-name", petTypeId);
+                        // Get pet data to check for custom name
+                        fr.wpets.model.PetData petData = plugin.getPetData(playerUuid, petTypeId);
+                        String displayName;
+                        if (petData != null && petData.getCustomName() != null && !petData.getCustomName().isEmpty()) {
+                            displayName = petData.getCustomName();
+                        } else {
+                            displayName = plugin.getPetsConfig()
+                                    .getString("pets." + petTypeId + ".display-name", petTypeId);
+                        }
                         createHologram(petEntity, displayName);
                     }
                 }

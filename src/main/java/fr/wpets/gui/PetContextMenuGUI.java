@@ -138,7 +138,14 @@ public class PetContextMenuGUI implements Listener {
      * Creates the info/stats item showing pet details.
      */
     private ItemStack createInfoItem(PetData petData, String petId) {
-        String displayName = plugin.getPetsConfig().getString("pets." + petId + ".display-name", petId);
+        String displayName;
+
+        // Use custom name if set, otherwise use default display-name from config
+        if (petData.getCustomName() != null && !petData.getCustomName().isEmpty()) {
+            displayName = petData.getCustomName();
+        } else {
+            displayName = plugin.getPetsConfig().getString("pets." + petId + ".display-name", petId);
+        }
 
         ItemStack item = new ItemStack(Material.PAPER);
         ItemMeta meta = item.getItemMeta();

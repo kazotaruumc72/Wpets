@@ -176,7 +176,13 @@ public class PetManager {
             // Create hologram above the pet
             HologramManager hologramManager = plugin.getHologramManager();
             if (hologramManager != null) {
-                String petDisplayName = petSec.getString("display-name", petId);
+                // Use custom name if set, otherwise use default display-name from config
+                String petDisplayName;
+                if (petData.getCustomName() != null && !petData.getCustomName().isEmpty()) {
+                    petDisplayName = petData.getCustomName();
+                } else {
+                    petDisplayName = petSec.getString("display-name", petId);
+                }
                 hologramManager.createHologram(entity, petDisplayName);
             }
 
@@ -467,13 +473,30 @@ public class PetManager {
         UUID uuid = player.getUniqueId();
         awaitingRename.remove(uuid);
 
+        String petId = activePetTypes.get(uuid);
+        if (petId == null) return;
+
         UUID petEntityUuid = activePets.get(uuid);
         if (petEntityUuid == null) return;
 
+        // Save custom name to PetData
+        PetData petData = plugin.getPetData(uuid, petId);
+        if (petData != null) {
+            petData.setCustomName(newName);
+            plugin.savePetData(petData);
+        }
+
+        // Update entity custom name
         Entity petEntity = Bukkit.getEntity(petEntityUuid);
         if (petEntity != null) {
             petEntity.setCustomName(MessageUtil.colorize(newName));
             petEntity.setCustomNameVisible(true);
+        }
+
+        // Update hologram
+        HologramManager hologramManager = plugin.getHologramManager();
+        if (hologramManager != null && petEntity != null) {
+            hologramManager.updateHologramText(petEntity, newName);
         }
     }
 
