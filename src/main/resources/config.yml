@@ -63,3 +63,59 @@ milestones:
     player-commands:
       - "advancement grant {player} only wpets:legendary_tamer"
       - "loot give {player} loot wpets:legendary_crate"
+
+# Pet level rewards (claimable through /pet rewards menu)
+# Players can claim these rewards once per pet when reaching the required level
+rewards:
+  5:
+    player-commands:
+      - "heal {player}"
+    console-commands:
+      - "eco give {player} 100"
+    nexo-items:
+      - "pet_treat:5"
+  10:
+    player-commands: []
+    console-commands:
+      - "eco give {player} 500"
+      - "give {player} diamond 3"
+    nexo-items:
+      - "rare_pet_collar:1"
+  20:
+    player-commands: []
+    console-commands:
+      - "eco give {player} 1000"
+      - "give {player} diamond 5"
+    nexo-items:
+      - "epic_pet_armor:1"
+      - "pet_elixir:3"
+  30:
+    player-commands: []
+    console-commands:
+      - "eco give {player} 2000"
+      - "give {player} netherite_ingot 2"
+    nexo-items:
+      - "legendary_pet_charm:1"
+  50:
+    player-commands: []
+    console-commands:
+      - "eco give {player} 5000"
+      - "give {player} netherite_sword 1"
+    nexo-items:
+      - "mythic_pet_essence:1"
+      - "ultimate_pet_token:1"
+  75:
+    player-commands: []
+    console-commands:
+      - "eco give {player} 10000"
+      - "give {player} elytra 1"
+    nexo-items:
+      - "ancient_pet_relic:1"
+  100:
+    player-commands: []
+    console-commands:
+      - "eco give {player} 25000"
+      - "advancement grant {player} only wpets:max_level_pet"
+    nexo-items:
+      - "divine_pet_crown:1"
+      - "eternal_companion_trophy:1"
