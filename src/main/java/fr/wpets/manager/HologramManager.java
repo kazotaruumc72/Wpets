@@ -2,7 +2,6 @@ package fr.wpets.manager;
 
 import de.oliver.fancyholograms.api.FancyHologramsPlugin;
 import de.oliver.fancyholograms.api.data.TextHologramData;
-import de.oliver.fancyholograms.api.events.HologramsLoadedEvent;
 import de.oliver.fancyholograms.api.hologram.Hologram;
 import fr.wpets.WpetsPlugin;
 import org.bukkit.Bukkit;
@@ -233,24 +232,6 @@ public class HologramManager implements Listener {
         if (event.getPlugin().getName().equals("FancyHolograms")) {
             plugin.getLogger().warning("FancyHolograms disabled - hologram support unavailable");
             clearHologramCache();
-        }
-    }
-
-    /**
-     * Handles FancyHolograms reload events to clean up leftover holograms.
-     */
-    @EventHandler
-    public void onHologramsLoaded(HologramsLoadedEvent event) {
-        // Clean up any leftover holograms from crashes/reloads
-        for (Hologram hologram : event.getManager()) {
-            if (hologram.getName().startsWith("wpets_pet_")) {
-                try {
-                    FancyHologramsPlugin.get().getHologramManager().removeHologram(hologram);
-                    plugin.getLogger().fine("Cleaned up leftover hologram: " + hologram.getName());
-                } catch (Exception e) {
-                    plugin.getLogger().log(Level.WARNING, "Failed to cleanup hologram on reload", e);
-                }
-            }
         }
     }
 
