@@ -68,6 +68,52 @@ milestones:
 # Players can claim these rewards once per pet when reaching the required level
 rewards:
   5:
+    # Optional: Custom slot position (if not specified, items are placed in order)
+    slot: 10
+    # Item appearance for different states
+    item:
+      # Before the player can claim (level requirement not met)
+      locked:
+        material: GRAY_DYE
+        custom-model-data: 0
+        name: "&7&lLevel {level} Reward &8(Locked)"
+        lore:
+          - ""
+          - "&7Your pet level: &e{pet_level}"
+          - "&7Required level: &e{level}"
+          - ""
+          - "&6Rewards:"
+          - "{rewards}"
+          - ""
+          - "&c✘ Reach level {level} to unlock!"
+      # When the player can claim (level requirement met, not yet claimed)
+      claimable:
+        material: YELLOW_DYE
+        custom-model-data: 0
+        name: "&e&lLevel {level} Reward &7(Click to claim!)"
+        lore:
+          - ""
+          - "&7Your pet level: &e{pet_level}"
+          - "&7Required level: &e{level}"
+          - ""
+          - "&6Rewards:"
+          - "{rewards}"
+          - ""
+          - "&e&lClick to claim this reward!"
+      # After the player has claimed the reward
+      claimed:
+        material: LIME_DYE
+        custom-model-data: 0
+        name: "&a&lLevel {level} Reward &7(Claimed)"
+        lore:
+          - ""
+          - "&7Your pet level: &e{pet_level}"
+          - "&7Required level: &e{level}"
+          - ""
+          - "&6Rewards:"
+          - "{rewards}"
+          - ""
+          - "&a✔ Already claimed!"
     player-commands:
       - "heal {player}"
     console-commands:
@@ -75,6 +121,47 @@ rewards:
     nexo-items:
       - "pet_treat:5"
   10:
+    slot: 11
+    item:
+      locked:
+        material: GRAY_DYE
+        custom-model-data: 0
+        name: "&7&lLevel {level} Reward &8(Locked)"
+        lore:
+          - ""
+          - "&7Your pet level: &e{pet_level}"
+          - "&7Required level: &e{level}"
+          - ""
+          - "&6Rewards:"
+          - "{rewards}"
+          - ""
+          - "&c✘ Reach level {level} to unlock!"
+      claimable:
+        material: YELLOW_DYE
+        custom-model-data: 0
+        name: "&e&lLevel {level} Reward &7(Click to claim!)"
+        lore:
+          - ""
+          - "&7Your pet level: &e{pet_level}"
+          - "&7Required level: &e{level}"
+          - ""
+          - "&6Rewards:"
+          - "{rewards}"
+          - ""
+          - "&e&lClick to claim this reward!"
+      claimed:
+        material: LIME_DYE
+        custom-model-data: 0
+        name: "&a&lLevel {level} Reward &7(Claimed)"
+        lore:
+          - ""
+          - "&7Your pet level: &e{pet_level}"
+          - "&7Required level: &e{level}"
+          - ""
+          - "&6Rewards:"
+          - "{rewards}"
+          - ""
+          - "&a✔ Already claimed!"
     player-commands: []
     console-commands:
       - "eco give {player} 500"
@@ -82,6 +169,47 @@ rewards:
     nexo-items:
       - "rare_pet_collar:1"
   20:
+    slot: 12
+    item:
+      locked:
+        material: GRAY_DYE
+        custom-model-data: 0
+        name: "&7&lLevel {level} Reward &8(Locked)"
+        lore:
+          - ""
+          - "&7Your pet level: &e{pet_level}"
+          - "&7Required level: &e{level}"
+          - ""
+          - "&6Rewards:"
+          - "{rewards}"
+          - ""
+          - "&c✘ Reach level {level} to unlock!"
+      claimable:
+        material: YELLOW_DYE
+        custom-model-data: 0
+        name: "&e&lLevel {level} Reward &7(Click to claim!)"
+        lore:
+          - ""
+          - "&7Your pet level: &e{pet_level}"
+          - "&7Required level: &e{level}"
+          - ""
+          - "&6Rewards:"
+          - "{rewards}"
+          - ""
+          - "&e&lClick to claim this reward!"
+      claimed:
+        material: LIME_DYE
+        custom-model-data: 0
+        name: "&a&lLevel {level} Reward &7(Claimed)"
+        lore:
+          - ""
+          - "&7Your pet level: &e{pet_level}"
+          - "&7Required level: &e{level}"
+          - ""
+          - "&6Rewards:"
+          - "{rewards}"
+          - ""
+          - "&a✔ Already claimed!"
     player-commands: []
     console-commands:
       - "eco give {player} 1000"
@@ -90,6 +218,47 @@ rewards:
       - "epic_pet_armor:1"
       - "pet_elixir:3"
   30:
+    slot: 13
+    item:
+      locked:
+        material: GRAY_DYE
+        custom-model-data: 0
+        name: "&7&lLevel {level} Reward &8(Locked)"
+        lore:
+          - ""
+          - "&7Your pet level: &e{pet_level}"
+          - "&7Required level: &e{level}"
+          - ""
+          - "&6Rewards:"
+          - "{rewards}"
+          - ""
+          - "&c✘ Reach level {level} to unlock!"
+      claimable:
+        material: YELLOW_DYE
+        custom-model-data: 0
+        name: "&e&lLevel {level} Reward &7(Click to claim!)"
+        lore:
+          - ""
+          - "&7Your pet level: &e{pet_level}"
+          - "&7Required level: &e{level}"
+          - ""
+          - "&6Rewards:"
+          - "{rewards}"
+          - ""
+          - "&e&lClick to claim this reward!"
+      claimed:
+        material: LIME_DYE
+        custom-model-data: 0
+        name: "&a&lLevel {level} Reward &7(Claimed)"
+        lore:
+          - ""
+          - "&7Your pet level: &e{pet_level}"
+          - "&7Required level: &e{level}"
+          - ""
+          - "&6Rewards:"
+          - "{rewards}"
+          - ""
+          - "&a✔ Already claimed!"
     player-commands: []
     console-commands:
       - "eco give {player} 2000"
@@ -97,6 +266,47 @@ rewards:
     nexo-items:
       - "legendary_pet_charm:1"
   50:
+    slot: 14
+    item:
+      locked:
+        material: GRAY_DYE
+        custom-model-data: 0
+        name: "&7&lLevel {level} Reward &8(Locked)"
+        lore:
+          - ""
+          - "&7Your pet level: &e{pet_level}"
+          - "&7Required level: &e{level}"
+          - ""
+          - "&6Rewards:"
+          - "{rewards}"
+          - ""
+          - "&c✘ Reach level {level} to unlock!"
+      claimable:
+        material: YELLOW_DYE
+        custom-model-data: 0
+        name: "&e&lLevel {level} Reward &7(Click to claim!)"
+        lore:
+          - ""
+          - "&7Your pet level: &e{pet_level}"
+          - "&7Required level: &e{level}"
+          - ""
+          - "&6Rewards:"
+          - "{rewards}"
+          - ""
+          - "&e&lClick to claim this reward!"
+      claimed:
+        material: LIME_DYE
+        custom-model-data: 0
+        name: "&a&lLevel {level} Reward &7(Claimed)"
+        lore:
+          - ""
+          - "&7Your pet level: &e{pet_level}"
+          - "&7Required level: &e{level}"
+          - ""
+          - "&6Rewards:"
+          - "{rewards}"
+          - ""
+          - "&a✔ Already claimed!"
     player-commands: []
     console-commands:
       - "eco give {player} 5000"
@@ -105,6 +315,47 @@ rewards:
       - "mythic_pet_essence:1"
       - "ultimate_pet_token:1"
   75:
+    slot: 15
+    item:
+      locked:
+        material: GRAY_DYE
+        custom-model-data: 0
+        name: "&7&lLevel {level} Reward &8(Locked)"
+        lore:
+          - ""
+          - "&7Your pet level: &e{pet_level}"
+          - "&7Required level: &e{level}"
+          - ""
+          - "&6Rewards:"
+          - "{rewards}"
+          - ""
+          - "&c✘ Reach level {level} to unlock!"
+      claimable:
+        material: YELLOW_DYE
+        custom-model-data: 0
+        name: "&e&lLevel {level} Reward &7(Click to claim!)"
+        lore:
+          - ""
+          - "&7Your pet level: &e{pet_level}"
+          - "&7Required level: &e{level}"
+          - ""
+          - "&6Rewards:"
+          - "{rewards}"
+          - ""
+          - "&e&lClick to claim this reward!"
+      claimed:
+        material: LIME_DYE
+        custom-model-data: 0
+        name: "&a&lLevel {level} Reward &7(Claimed)"
+        lore:
+          - ""
+          - "&7Your pet level: &e{pet_level}"
+          - "&7Required level: &e{level}"
+          - ""
+          - "&6Rewards:"
+          - "{rewards}"
+          - ""
+          - "&a✔ Already claimed!"
     player-commands: []
     console-commands:
       - "eco give {player} 10000"
@@ -112,6 +363,47 @@ rewards:
     nexo-items:
       - "ancient_pet_relic:1"
   100:
+    slot: 16
+    item:
+      locked:
+        material: GRAY_DYE
+        custom-model-data: 0
+        name: "&7&lLevel {level} Reward &8(Locked)"
+        lore:
+          - ""
+          - "&7Your pet level: &e{pet_level}"
+          - "&7Required level: &e{level}"
+          - ""
+          - "&6Rewards:"
+          - "{rewards}"
+          - ""
+          - "&c✘ Reach level {level} to unlock!"
+      claimable:
+        material: YELLOW_DYE
+        custom-model-data: 0
+        name: "&e&lLevel {level} Reward &7(Click to claim!)"
+        lore:
+          - ""
+          - "&7Your pet level: &e{pet_level}"
+          - "&7Required level: &e{level}"
+          - ""
+          - "&6Rewards:"
+          - "{rewards}"
+          - ""
+          - "&e&lClick to claim this reward!"
+      claimed:
+        material: LIME_DYE
+        custom-model-data: 0
+        name: "&a&lLevel {level} Reward &7(Claimed)"
+        lore:
+          - ""
+          - "&7Your pet level: &e{pet_level}"
+          - "&7Required level: &e{level}"
+          - ""
+          - "&6Rewards:"
+          - "{rewards}"
+          - ""
+          - "&a✔ Already claimed!"
     player-commands: []
     console-commands:
       - "eco give {player} 25000"
