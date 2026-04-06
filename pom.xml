@@ -71,6 +71,13 @@
             <artifactId>FancyHolograms</artifactId>
             <version>2.3.0</version>
             <scope>provided</scope>
+            <exclusions>
+                <!-- ChatColorHandler JAR is often corrupted on download; exclude to avoid ZipException -->
+                <exclusion>
+                    <groupId>me.dave</groupId>
+                    <artifactId>ChatColorHandler</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <!-- SQLite JDBC (bundled) -->
@@ -194,8 +201,8 @@
                         </goals>
                         <configuration>
                             <target>
-                                <echo message="Ensuring ChatColorHandler cache is clean (removing ${maven.repo.local}/me/dave/ChatColorHandler if present)"/>
-                                <delete dir="${maven.repo.local}/me/dave/ChatColorHandler"
+                                <echo message="Ensuring ChatColorHandler cache is clean (removing ${settings.localRepository}/me/dave/ChatColorHandler if present)"/>
+                                <delete dir="${settings.localRepository}/me/dave/ChatColorHandler"
                                         quiet="true"
                                         failonerror="false"/>
                             </target>
