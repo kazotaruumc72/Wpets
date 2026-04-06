@@ -57,3 +57,8 @@ admin-set-level: "&aSet {player}'s pet &6{pet} &ato level &6{level}&a."
 admin-give-xp: "&aGave &6{xp} &aXP to {player}'s pet &6{pet}&a."
 admin-player-not-found: "&cPlayer &6{player} &cnot found or not online."
 invalid-args: "&cInvalid arguments. Usage: {usage}"
+
+# Rewards
+reward-claimed: "&a&l✓ &aReward claimed! You received your Level {level} rewards!"
+reward-already-claimed: "&cYou have already claimed this reward."
+reward-level-required: "&cYou need to reach level &6{level} &cto claim this reward."

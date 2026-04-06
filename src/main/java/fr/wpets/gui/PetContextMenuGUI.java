@@ -34,6 +34,7 @@ public class PetContextMenuGUI implements Listener {
     private static final int SLOT_FOLLOW = 12;
     private static final int SLOT_RENAME = 14;
     private static final int SLOT_INFO = 16;
+    private static final int SLOT_REWARDS = 22;
 
     public PetContextMenuGUI(WpetsPlugin plugin) {
         this.plugin = plugin;
@@ -63,6 +64,7 @@ public class PetContextMenuGUI implements Listener {
         inv.setItem(SLOT_FOLLOW, createFollowItem(player));
         inv.setItem(SLOT_RENAME, createRenameItem());
         inv.setItem(SLOT_INFO, createInfoItem(petData, petId));
+        inv.setItem(SLOT_REWARDS, createRewardsItem());
 
         player.openInventory(inv);
     }
@@ -184,6 +186,25 @@ public class PetContextMenuGUI implements Listener {
     }
 
     /**
+     * Creates the rewards item.
+     */
+    private ItemStack createRewardsItem() {
+        ItemStack item = new ItemStack(Material.CHEST);
+        ItemMeta meta = item.getItemMeta();
+        if (meta != null) {
+            meta.setDisplayName(MessageUtil.colorize("&6&lPet Rewards"));
+            List<String> lore = new ArrayList<>();
+            lore.add(MessageUtil.colorize("&7View and claim rewards"));
+            lore.add(MessageUtil.colorize("&7based on your pet's level"));
+            lore.add("");
+            lore.add(MessageUtil.colorize("&eClick to open rewards menu!"));
+            meta.setLore(lore);
+            item.setItemMeta(meta);
+        }
+        return item;
+    }
+
+    /**
      * Handles inventory click events for the context menu.
      */
     @EventHandler
@@ -233,6 +254,11 @@ public class PetContextMenuGUI implements Listener {
             case SLOT_INFO -> {
                 // Just close the menu, info is display-only
                 player.closeInventory();
+            }
+            case SLOT_REWARDS -> {
+                // Open the rewards menu
+                player.closeInventory();
+                plugin.getPetRewardsGUI().open(player);
             }
         }
     }
