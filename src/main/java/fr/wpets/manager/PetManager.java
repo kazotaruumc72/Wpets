@@ -94,7 +94,10 @@ public class PetManager {
     public void despawnAll() {
         for (UUID mobUuid : new ArrayList<>(activePets.values())) {
             // Remove hologram first
-            plugin.getHologramManager().removeHologram(mobUuid);
+            HologramManager hologramManager = plugin.getHologramManager();
+            if (hologramManager != null) {
+                hologramManager.removeHologram(mobUuid);
+            }
 
             Entity e = Bukkit.getEntity(mobUuid);
             if (e != null) {
@@ -171,8 +174,11 @@ public class PetManager {
             plugin.getMilestoneManager().applyPassiveEffects(player, petData, entity);
 
             // Create hologram above the pet
-            String petDisplayName = petSec.getString("display-name", petId);
-            plugin.getHologramManager().createHologram(entity, petDisplayName);
+            HologramManager hologramManager = plugin.getHologramManager();
+            if (hologramManager != null) {
+                String petDisplayName = petSec.getString("display-name", petId);
+                hologramManager.createHologram(entity, petDisplayName);
+            }
 
             return true;
 
@@ -194,7 +200,10 @@ public class PetManager {
 
         if (mobUuid != null) {
             // Remove hologram first
-            plugin.getHologramManager().removeHologram(mobUuid);
+            HologramManager hologramManager = plugin.getHologramManager();
+            if (hologramManager != null) {
+                hologramManager.removeHologram(mobUuid);
+            }
 
             Entity e = Bukkit.getEntity(mobUuid);
             if (e != null) {

@@ -87,7 +87,14 @@ public class WpetsPlugin extends JavaPlugin {
         petManager      = new PetManager(this);
         experienceManager = new ExperienceManager(this);
         milestoneManager  = new MilestoneManager(this);
-        hologramManager   = new HologramManager(this);
+
+        // Initialize HologramManager only if FancyHolograms is available
+        if (getServer().getPluginManager().getPlugin("FancyHolograms") != null) {
+            hologramManager = new HologramManager(this);
+            getLogger().info("FancyHolograms detected - hologram support enabled");
+        } else {
+            getLogger().info("FancyHolograms not found - hologram support disabled");
+        }
 
         skillManager.load();
 
@@ -109,11 +116,15 @@ public class WpetsPlugin extends JavaPlugin {
         getServer().getPluginManager().registerEvents(skillTreeGUI, this);
         getServer().getPluginManager().registerEvents(petSelectionGUI, this);
         getServer().getPluginManager().registerEvents(petContextMenuGUI, this);
-        getServer().getPluginManager().registerEvents(hologramManager, this);
+        if (hologramManager != null) {
+            getServer().getPluginManager().registerEvents(hologramManager, this);
+        }
 
         // Background tasks
         petManager.startFollowTask();
-        hologramManager.startUpdateTask();
+        if (hologramManager != null) {
+            hologramManager.startUpdateTask();
+        }
         startAutoSaveTask();
 
         getLogger().info("Wpets v" + getDescription().getVersion() + " enabled successfully.");
@@ -311,6 +322,6 @@ public class WpetsPlugin extends JavaPlugin {
     }
 
     public HologramManager getHologramManager() {
-        return hologramManager;
+        return hologramManager; // May be null if FancyHolograms is not available
     }
 }
