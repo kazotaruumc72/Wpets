@@ -3,6 +3,7 @@ package fr.wpets.manager;
 import de.oliver.fancyholograms.api.FancyHologramsPlugin;
 import de.oliver.fancyholograms.api.data.TextHologramData;
 import de.oliver.fancyholograms.api.hologram.Hologram;
+import de.oliver.fancyholograms.api.data.property.Visibility;
 import fr.wpets.WpetsPlugin;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -73,6 +74,8 @@ public class HologramManager implements Listener {
             TextHologramData data = new TextHologramData(hologramName, hologramLoc);
             data.setPersistent(false);
             data.setTextUpdateInterval(20); // Update every second
+            data.setVisibility(Visibility.ALL); // Make visible to all players
+            data.setVisibilityDistance(32); // Set visibility distance
 
             // Add lines
             if (!petName.isEmpty()) {
@@ -86,7 +89,8 @@ public class HologramManager implements Listener {
             Hologram hologram = FancyHologramsPlugin.get().getHologramManager().create(data);
             if (hologram != null) {
                 hologram.createHologram();
-                hologram.showHologram(Bukkit.getOnlinePlayers());
+                // Use forceShowHologram to actually send packets and make it visible
+                Bukkit.getOnlinePlayers().forEach(hologram::forceShowHologram);
                 activeHolograms.put(petEntity.getUniqueId(), hologram);
                 return true;
             }
