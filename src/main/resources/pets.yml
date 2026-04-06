@@ -9,6 +9,8 @@ pets:
     display-name: "&6Wolf Guardian"
     # Permission required to summon this pet
     permission: "wpets.pet.wolf_guardian"
+    # Flying mount (true for flying pets like ghasts, false for ground pets like wolves)
+    flying: false
     # Menu icon configuration
     menu-icon:
       material: BONE
@@ -87,6 +89,8 @@ pets:
     display-name: "&bCat Familiar"
     # Permission required to summon this pet
     permission: "wpets.pet.cat_familiar"
+    # Flying mount (true for flying pets like ghasts, false for ground pets like cats)
+    flying: false
     # Menu icon configuration
     menu-icon:
       material: COD
@@ -162,6 +166,8 @@ pets:
     display-name: "&6Beepu"
     # Permission required to summon this pet
     permission: "wpets.pet.beepu"
+    # Flying mount (true for flying pets like ghasts, false for ground pets)
+    flying: false
     # Menu icon configuration
     menu-icon:
       material: BONE

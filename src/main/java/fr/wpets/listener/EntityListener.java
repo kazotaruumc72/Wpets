@@ -1,6 +1,8 @@
 package fr.wpets.listener;
 
 import fr.wpets.WpetsPlugin;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Monster;
 import org.bukkit.entity.Player;
@@ -9,6 +11,8 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.vehicle.VehicleExitEvent;
+import org.bukkit.util.Vector;
 
 import java.util.UUID;
 
@@ -18,6 +22,7 @@ import java.util.UUID;
  *   <li>Award pet XP when the owner kills a hostile mob.</li>
  *   <li>Clean up active-pet tracking when the pet entity itself dies.</li>
  *   <li>Prevent players from damaging pets (both their own and others').</li>
+ *   <li>Handle flying pet movement when mounted.</li>
  * </ul>
  */
 public class EntityListener implements Listener {
@@ -92,6 +97,32 @@ public class EntityListener implements Listener {
         // If a player is trying to damage a pet, cancel the event
         if (damager != null) {
             event.setCancelled(true);
+        }
+    }
+
+    /**
+     * Handles dismounting from flying pets to restore gravity.
+     */
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onVehicleExit(VehicleExitEvent event) {
+        if (!(event.getExited() instanceof Player player)) return;
+
+        Entity vehicle = event.getVehicle();
+        UUID ownerUuid = plugin.getPetManager().getOwnerByMobUuid(vehicle.getUniqueId());
+
+        // Check if this is a pet vehicle
+        if (ownerUuid == null) return;
+
+        // Check if it's a flying pet
+        String petId = plugin.getPetManager().getActivePetTypeId(ownerUuid);
+        if (petId != null) {
+            FileConfiguration petsCfg = plugin.getPetsConfig();
+            boolean isFlying = petsCfg.getBoolean("pets." + petId + ".flying", false);
+
+            // Restore gravity when dismounting from flying pets
+            if (isFlying) {
+                vehicle.setGravity(true);
+            }
         }
     }
 }
