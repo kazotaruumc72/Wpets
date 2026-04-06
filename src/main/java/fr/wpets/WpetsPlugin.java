@@ -90,8 +90,13 @@ public class WpetsPlugin extends JavaPlugin {
 
         // Initialize HologramManager only if FancyHolograms is available
         if (getServer().getPluginManager().getPlugin("FancyHolograms") != null) {
-            hologramManager = new HologramManager(this);
-            getLogger().info("FancyHolograms detected - hologram support enabled");
+            try {
+                hologramManager = new HologramManager(this);
+                getLogger().info("FancyHolograms detected - hologram support enabled");
+            } catch (NoClassDefFoundError e) {
+                getLogger().warning("FancyHolograms plugin found but API classes not available - hologram support disabled");
+                getLogger().warning("Make sure FancyHolograms is properly installed. Error: " + e.getMessage());
+            }
         } else {
             getLogger().info("FancyHolograms not found - hologram support disabled");
         }
