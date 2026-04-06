@@ -3,7 +3,7 @@ package fr.wpets.manager;
 import de.oliver.fancyholograms.api.FancyHologramsPlugin;
 import de.oliver.fancyholograms.api.data.TextHologramData;
 import de.oliver.fancyholograms.api.hologram.Hologram;
-import de.oliver.fancyholograms.api.data.property.Visibility;
+import de.oliver.fancyholograms.api.data.property.visibility.Visibility;
 import fr.wpets.WpetsPlugin;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
