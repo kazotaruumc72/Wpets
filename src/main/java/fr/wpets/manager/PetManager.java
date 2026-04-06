@@ -518,7 +518,7 @@ public class PetManager {
         PetData petData = plugin.getPetData(uuid, petId);
         if (petData != null) {
             petData.setCustomName(newName);
-            plugin.savePetData(petData);
+            plugin.getDatabaseManager().savePetData(petData);
         }
 
         // Update entity custom name
